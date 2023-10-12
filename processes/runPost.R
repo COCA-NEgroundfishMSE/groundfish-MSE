@@ -50,7 +50,7 @@ traj_these <- c("SSB", "SSB_cur", "R", "F_full", "sumCW",
               "ACL", "F_fullAdvice")
 
 SIMboxplot_these<-c("HHI_fleet","Shannon_fleet","Gini_fleet", 
-                  "Gini_fleet_bioecon_stocks", "total_rev", "total_modeled_rev", "total_groundfish_rev")
+                  "Gini_fleet_bioecon_stocks", "total_fleet_rev", "total_fleet_modeled_rev", "total_fleet_groundfish_rev")
 SIMrp_these<-SIMboxplot_these
 SIMtraj_these <-SIMboxplot_these
 
@@ -100,7 +100,7 @@ if(length(sl)==1){
   }
   
   names(simlevel)<-names(slLst[[1]])
-  
+
   tot_reps<-dim(simlevel[[1]])[1]
   
   for(i in 1:(length(simlevel)-1)){
