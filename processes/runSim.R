@@ -13,7 +13,7 @@ source('processes/readin_previous_omval.R')
 # if on local machine (i.e., not hpcc) must compile the tmb code
 # (HPCC runs have a separate call to compile this code). Keep out of
 # runSetup.R because it is really a separate process on the HPCC.
-if(runClass == 'local'){
+if(runClass != 'HPCC' ){
   source('processes/runPre.R', local=ifelse(exists('plotFlag'), TRUE, FALSE))
 }
 
@@ -49,6 +49,7 @@ for(r in 1:nrep){
   
   #### Top MP loop ####
   for(m in 1:nrow(mproc)){
+    
     print(paste0("rep # ",r, " and model #", m))
     yearitercounter<-0
     iterpb <- txtProgressBar(min = 1, max = max_yiter, style = 3)
