@@ -174,7 +174,7 @@ if (platform == 'Linux'){
     
   # setup command to run ASAP.
   if(runClass=='mleeContainer'){
-    from.path<-"/home/mlee/ADMB_12.3/admb/asap3"
+    from.path<-"/home/mlee/ADMB_12.3/admb/ASAP3"
   } else if(runClass=='HPCC'){
     from.path<- paste('../EXE/ASAP3.EXE', sep = "")
   } else{
