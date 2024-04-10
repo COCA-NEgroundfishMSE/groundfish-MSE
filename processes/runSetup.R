@@ -172,9 +172,9 @@ if (platform == 'Linux'){
   dir.create(file.path(rundir), showWarnings = FALSE, recursive=TRUE)
   
     
-  # setup command to run ASAP. For now, ASAP is located at /net/home2/mlee/admb-12.3/ASAP3/ASAP3
+  # setup command to run ASAP.
   if(runClass=='mleeContainer'){
-    from.path<-"/home/mlee/mlee_net/admb-12.3/ASAP3/ASAP3"
+    from.path<-"/home/mlee/ADMB_12.3/admb/ASAP3"
   } else if(runClass=='HPCC'){
     from.path<- paste('../EXE/ASAP3.EXE', sep = "")
   } else{
