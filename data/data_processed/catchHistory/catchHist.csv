@@ -1,4 +1,4 @@
-Stock,Total,Commercial,Sector,Common Pool,Recreational,Herring Fishery,Scallop Fishery,State Water,Other,Year,Small Mesh,data_type
+Stock,Total,DirectedFishery,Sector,Common Pool,Recreational,Herring Fishery,Scallop Fishery,State Water,Other,Year,Small Mesh,data_type
 GB cod,3028.9,2829.7,2745.8,84,NA,NA,NA,27.7,171.4,2010,NA,Catch
 GOM cod,5745.2,5497.1,3617.1,226,1654,NA,NA,190.3,57.8,2010,NA,Catch
 GB Haddock,8542,8340.2,8248,92.2,NA,69.2,NA,1.6,131,2010,NA,Catch
