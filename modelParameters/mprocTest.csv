@@ -1,7 +1,7 @@
-ASSESSCLASS,HCR,FREF_TYP,FREF_PAR0,FREF_PAR1,BREF_TYP,BREF_PAR0,BREF_PAR1,RFUN_NM,RPInt,ImplementationClass,LandZero,CatchZero,EconType,EconName,EconData,MultiplierFile,OutputPriceFile,InputPriceFile,ProdEqn,ChoiceEqn
-ASAP,slide,SPR,0.4,NA,RSSBR,20,-1,hindcastMean,2,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-ASAP,constF,SPR,0.4,NA,RSSBR,20,-1,hindcastMean,2,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-CAA,slide,YPR,0.1,NA,SIM,10,NA,forecast,5,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-PLANB,NA,NA,NA,NA,NA,NA,NA,NA,NA,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-ASAP,constF,SPR,0.1,NA,SIM,12,NA,forecast,2,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+ASSESSCLASS,HCR,FREF_TYP,FREF_PAR0,FREF_PAR1,BREF_TYP,BREF_PAR0,BREF_PAR1,RFUN_NM,RPInt,AssessFreq,ImplementationClass,projections,rhoadjust,mincatch,varlimit,Lag,LandZero,CatchZero,EconType,EconName,EconData,MultiplierFile,OutputPriceFile,InputPriceFile,ProdEqn,ChoiceEqn,econ_year_style,ie_override,ie_source,ie_from_model,ie_from_replicate
+ASAP,slide,SPR,0.4,NA,RSSBR,20,-1,hindcastMean,2,1,StandardFisheries,TRUE,FALSE,TRUE,FALSE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+ASAP,constF,SPR,0.4,NA,RSSBR,20,-1,hindcastMean,2,1,StandardFisheries,TRUE,FALSE,TRUE,FALSE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+CAA,slide,YPR,0.1,NA,SIM,10,NA,forecast,5,1,StandardFisheries,TRUE,FALSE,TRUE,FALSE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,1,StandardFisheries,TRUE,FALSE,TRUE,FALSE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+PLANB,NA,NA,NA,NA,NA,NA,NA,NA,NA,1,StandardFisheries,TRUE,FALSE,TRUE,FALSE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+ASAP,constF,SPR,0.1,NA,SIM,12,NA,forecast,2,1,StandardFisheries,TRUE,FALSE,TRUE,FALSE,TRUE,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA

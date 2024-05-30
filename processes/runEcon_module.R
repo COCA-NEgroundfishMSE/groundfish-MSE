@@ -25,7 +25,7 @@ fishery_holder$targeted<-0
 # Subset the fishery_holder to rows that have a biological model, and keep the spstock2 and ln_trawl_survey columns
 ts<-fishery_holder[bio_model==1, c('spstock2','ln_trawlsurvey','ln_obs_trawlsurvey','sectorACL')]
 
-if(mproc$EconName[m]=="MSE_rebuilt"){
+if(mproc$EconName[m]=="MSE_rebuilt" |mproc$EconName[m]== "MSE_PHA_rebuilt"){
   source('processes/adjust_survey.R')
 }
 
