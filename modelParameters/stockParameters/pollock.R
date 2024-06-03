@@ -108,10 +108,24 @@ pe_R <- 0.5
 pe_RSA <- 0.5 #stolen from cod, find values from stock assessment
 pe_IA <- 0.18
   
-# implementation error of fishing mortality
+# Implementation Error
+## implementation error of fishing mortality
 ie_F <- 0
 ie_typ <- 'lognorm'
 ie_bias <- 0 # % bias in implementation error
+
+
+## implementation error of Catch Limit (iecl)
+### Very few observations, baseline case is a uniform implementation error is uniformly distributed between  the upper (iecl_upper) and lower bounds (iecl_lower)
+### These are parameterized using the pre-catch share time period.
+### Catch=ACL*(1+iecl).  A random draw where iecl=0 <--> Catch=ACL.
+# See /preprocessing/economic/readin_older_catchHist.do and compute_catch_limit_deviations.do
+
+iecl_type<-'uniform'
+iecl_upper<- .0695
+iecl_lower<- -0.4602
+
+
 
 # Observation bias (1 is no bias, 0.9 is a -10% bias, etc.)
 ob_sumCW <- 1
