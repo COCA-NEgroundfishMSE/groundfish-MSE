@@ -49,3 +49,17 @@ do "$codedir/stocks_in_model.do"
 do "$codedir/recode_catch_limits.do"
 do "$codedir/multiplier_prep.do"
 
+
+/* read in the quota price coefficients*/
+
+
+do "$codedir/quota_price_coef_export.do"
+/* get rhs data needed for quota price predictions */
+do "$codedir/quota_price_data_export.do"
+
+
+
+
+do "$codedir/readin_older_catchHist.do"
+do "$codedir/compute_catch_limit_deviations.do"
+
