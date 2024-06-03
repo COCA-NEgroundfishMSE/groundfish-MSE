@@ -61,3 +61,6 @@ gradfil1.tmp
 gradfil2.tmp
 variance
 varssave.tmp
+*.log
+.Rprofile
+!data/data_raw/catchHistory/Landings*.xlsx
