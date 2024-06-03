@@ -17,13 +17,18 @@ Ideally, we would compare the results of single- and multi-species simulation mo
 [^method1]: We’re doing something this for the Economics focused paper -- we estimate a behavioral model under Days-at-Sea managment (2004-2009) and then validate the parameters by simulating the 2010-2015 period, with certain adjustments. 
 
 ## Actual Methods:  
-We construct stock dynamics models for five stocks of fish (1 GOM, 3 GB, 1 Unit) that are managed together.  We couple those models with an individual-based model of fishing grounded in economic principles.  We apply an HCR to get target *F*s and catch limits for the modeled stocks.  
-
+We construct stock dynamics models for three stocks of fish on Georges Bank that are managed together.
+We couple those models with an individual-based model of fishing grounded in economic principles. 
+We apply an HCR to get target *F*s and catch limits for the modeled stocks.  
 We then conduct four sets of “matched” simulations for a moderate number of years (say 15-30):
 
-Simulation 1B - Multispecies bioeconomic:  If the aggregate quotas are reached for a stock, fishing for all regulated groundfish by vessels in the groundfish fishery in that area ceases.  Vessels that want to fish in that area could "declare out" of groundfish, but they cannot land groundfish and their catch does not count against the groundfish catch limits.  This scenario closely mimics the current catch share system for multispecies.  
-Simulation 2B -“single-species” bioeconomic -- if the aggregate quota is reached for a stock, fishing for only that stock stops.  Perfect avoidance (fishermen somehow avoid all of the closed stock).  
 
+Simulation 1B - Multispecies bioeconomic:  If the aggregate quotas are reached for a stock, fishing for all regulated groundfish by vessels in the groundfish fishery in that area ceases.
+Vessels that want to fish in that area could "declare out" of groundfish, but they cannot land groundfish and their catch does not count against the groundfish catch limits. 
+This scenario closely mimics the current catch share system for multispecies.  
+
+Simulation 2B -“single-species” bioeconomic -- if the aggregate quota is reached for a stock, fishing for only that stock stops.  
+Perfect avoidance (fishermen somehow avoid all of the closed stock).  
 
 <!---
 \begin{align}
@@ -32,7 +37,11 @@ F_{real}& = F_{advice}*\varepsilon\\
 \end{align}
 --->
   
-For both of these simulations, we can compute realized $F$ and therefore the implementation error in any year. We characterize the distribution of "implementation error" for our stocks (that is assumed to be i.i.d, probably a log-normal or half normal). We will either fit a distribution or draw directly out of those error terms.  We then simulate the "traditional" fisheries model with random implementation error implied by those distributions[^method2].  This mimics an MSE-implementation error approach.  
+For both of these simulations, we can compute realized $F$ and therefore the implementation error in any year.
+We characterize the distribution of "implementation error" for our stocks (that is assumed to be i.i.d, probably a log-normal or half normal). 
+We will either fit a distribution or draw directly out of those error terms.
+We then simulate the "traditional" fisheries model with random implementation error implied by those distributions[^method2].
+This mimics an MSE-implementation error approach.  
 
 Simulation 1T Multispecies traditional: apply a traditional fisheries model where the implementation errors come from the Simulation 1B.
 
