@@ -112,3 +112,10 @@ do "$codedir/multiplier_prep.do"
 do "$codedir/quota_price_coef_export.do"
 /* get rhs data needed for quota price predictions */
 do "$codedir/quota_price_data_export.do"
+
+
+
+
+do "$codedir/readin_older_catchHist.do"
+do "$codedir/compute_catch_limit_deviations.do"
+
