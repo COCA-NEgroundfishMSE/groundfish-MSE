@@ -16,7 +16,7 @@ get_fillRepArrays <- function(stock){
     omval$SSB[r,m,] <- SSB
     omval$R[r,m,] <- R
     omval$F_full[r,m,] <- F_full
-    omval$sumCW[r,m,] <- sumCW
+    omval$sumCW[r,m,] <- sumCW #Catch of fish, metric tons
     omval$OFdStatus[r,m,] <- OFdStatus
     omval$mxGradCAA[r,m,] <- mxGradCAA
     omval$F_fullAdvice[r,m,] <- F_fullAdvice #AEW
@@ -24,6 +24,9 @@ get_fillRepArrays <- function(stock){
     omval$OFgStatus[r,m,] <- OFgStatus #AEW
     omval$SSB_cur[r,m,] <- SSB_cur #AEW
     omval$natM[r,m,] <- natM #AEW
+    
+    
+    omval$sumEconIW[r,m,y]<-sumEconIW[y] # "Economic" trawl survey biomass, metric tons per tow.
     
     # annPercentChange not true vector -- just repeated values. This needs
     # to be calculated after the run so that the appropriate time windows
@@ -40,14 +43,19 @@ get_fillRepArrays <- function(stock){
     omval$SSBPROXY[r,m,] <- RPmat[,2]
     omval$FPROXYT[r,m,] <- RPmat[,3]
     omval$SSBPROXYT[r,m,] <- RPmat[,4]
+    
+    if(y>=fmyearIdx){
     omval$FRATIO[r,m,y] <- stock$res$F.report[length(stock$res$F.report)]/RPmat[,1][y]
     omval$SSBRATIO[r,m,y] <- stock$res$SSB[length(stock$res$SSB)]/RPmat[,2][y]
+    omval$FRATIOT[r,m,y] <- stock$F_full[y]/RPmat[,3][y]
+    omval$SSBRATIOT[r,m,y] <- stock$SSB[y]/RPmat[,4][y]
+    }
+    
+    
     if(mproc[m,'rhoadjust'] == 'TRUE' & y>fmyearIdx & Mohns_Rho_SSB[y]>0.15){
     omval$FRATIO[r,m,y] <- (stock$res$F.report[length(stock$res$F.report)]/(Mohns_Rho_F[y]+1))/RPmat[,1][y]
     omval$SSBRATIO[r,m,y] <-(stock$res$SSB[length(stock$res$SSB)]/(Mohns_Rho_SSB[y]+1))/RPmat[,2][y]
     }
-    omval$FRATIOT[r,m,y] <- stock$F_full[y]/RPmat[,3][y]
-    omval$SSBRATIOT[r,m,y] <- stock$SSB[y]/RPmat[,4][y]
     if(y == nyear){
       # Determine whether additional years should be added on to the
       # beginning of the series
@@ -84,10 +92,14 @@ get_fillRepArrays <- function(stock){
     omval$Mohns_Rho_F[r,m,]<-Mohns_Rho_F#MDM
     omval$Mohns_Rho_R[r,m,]<-Mohns_Rho_R#MDM
     omval$mincatchcon[r,m,]<-mincatchcon
-    omval$SSBest[y,1:length(stock$res$SSB)]<-stock$res$SSB
-    omval$Fest[y,1:length(stock$res$SSB)]<-stock$res$F.report
-    omval$Catchest[y,1:length(stock$res$SSB)]<-stock$res$catch.pred
-    omval$Rest[y,1:length(stock$res$SSB)]<-stock$res$N.age[,1]
+    
+    if(y>=fmyearIdx){
+      omval$SSBest[y,1:length(stock$res$SSB)]<-stock$res$SSB
+      omval$Fest[y,1:length(stock$res$SSB)]<-stock$res$F.report
+      omval$Catchest[y,1:length(stock$res$SSB)]<-stock$res$catch.pred
+      omval$Rest[y,1:length(stock$res$SSB)]<-stock$res$N.age[,1]
+    }
+    
     if (y == nyear){
     omval$relTermE_SSB[r,m,] <- relTermE_SSB #MDM
     omval$relTermE_CW[r,m,] <- relTermE_CW #MDM
@@ -97,6 +109,16 @@ get_fillRepArrays <- function(stock){
     omval$relTermE_R[r,m,] <- relTermE_R #MDM
     omval$relTermE_F[r,m,] <- relTermE_F #MDM
     }
+    #Econ specific outputs. Not put until management starts in fmyearIdx
+    if(mproc$ImplementationClass[m]=="Economic"){
+      if(y >= fmyearIdx){
+    omval$Gini_stock_within_season_BKS[r,m,y]<-Gini_stock_within_season_BKS[y] #Gini coefficient over the days of the fishing year
+    omval$econCW[r,m,y]<-econCW[y] #"Economic" total catch in metric tons  
+    omval$avgprice_per_lb[r,m,y]<-avgprice_per_lb[y] #"Economic" total catch in metric tons  
+    omval$modeled_fleet_removals_mt[r,m,y]<-modeled_fleet_removals_mt[y] #"Economic" total catch in metric tons  
+    
+      }
+    }    
   })
 
   return(out)

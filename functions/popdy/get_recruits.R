@@ -181,9 +181,8 @@ get_recruits <- function(type, type2, par, inputSSB, TAnom_y, pe_R, block,
   out <- list(Rhat = unname(Rhat), R = unname(R))
 
   return(out)
-  
-  })
-}
+  })}
+
 
 
 

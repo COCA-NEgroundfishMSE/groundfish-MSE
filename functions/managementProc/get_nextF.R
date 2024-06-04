@@ -237,7 +237,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
       }
       
       #If catch variation constraint is on, make sure catch advice does not vary more than 20% from year to year
-      if(tolower(mproc$varlimit) == 'true'){
+      if(tolower(mproc$varlimit[m]) == 'true'){
         if(((catchproj[1]-(stockEnv$sumCW[y-1]*stockEnv$ob_sumCW))/catchproj[1])*100<(-20)){
           catchproj[1]<-(stockEnv$sumCW[y-1]*stockEnv$ob_sumCW)-((stockEnv$sumCW[y-1]*stockEnv$ob_sumCW)*.2)}
         if(((catchproj[1]-(stockEnv$sumCW[y-1]*stockEnv$ob_sumCW))/catchproj[1])*100>20){
@@ -265,7 +265,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
                                     stReportYr = 2,
                                     stockEnv = stockEnv)$sumCW}
         catchproj<-c(median(catchproj[,1]),median(catchproj[,1]))
-        if(tolower(mproc$varlimit) == 'true'){
+        if(tolower(mproc$varlimit[m]) == 'true'){
           if(((catchproj[2]-catchproj[1])/catchproj[2])*100>20){
             catchproj[2]<- catchproj[1]+(catchproj[1]*.2)}
         }

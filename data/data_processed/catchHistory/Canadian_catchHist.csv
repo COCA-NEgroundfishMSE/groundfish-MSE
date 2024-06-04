@@ -1,0 +1,50 @@
+Stock,Year,CanadaLandings,CanadaDiscards,CanadaCatch,TotalCatch,USQuota,CanadaQuota,TotalQuota,Source
+GB Yellowtail Flounder,2004,96,422,518,6815,6000,1900,7900,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2005,30,247,277,3852,4260,1740,6000,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2006,25,452,477,2057,2070,930,3000,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2007,17,97,114,1664,900,350,1250,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2008,41,112,153,1499,1950,550,2500,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2009,5,84,89,1806,1617,483,2100,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2010,17,210,227,1170,1200,756,1956,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2011,22,53,75,1171,1458,1192,2650,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2012,46,48,94,725,564,586,1150,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2013,1,39,40,218,215,285,500,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2014,1,14,15,159,328,72,400,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2015,3,11,14,118,248,106,354,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2016,1,10,11,44,269,85,354,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2017,1,2,3,95,207,93,300,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2018,1,3,4,45,213,87,300,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2019,1,4,5,8,106,34,140,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2020,1,6,7,68,120,42,162,https://repository.library.noaa.gov/view/noaa/45281
+GB Yellowtail Flounder,2021,1,4,5,51,80,45,125,https://repository.library.noaa.gov/view/noaa/45281
+GB Cod,2008,1390,,1529,1774,667,1633,2300,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2009,1003,,1209,1789,527,1173,1700,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2010,748,,840,1294,338,1012,1350,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2011,702,,743,1030,200,850,1050,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2012,395,,468,616,63,612,675,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2013,385,,424,464,96,504,600,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2014,430,,458,574,154,546,700,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2015,472,,492,608,124,526,650,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2016,428,,440,537,136,488,624,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2017,474,,488,526,146,584,730,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2018,510,,517,565,257,694,951,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2019,388,,396,428,189,461,650,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2020,362,,377,444,189,461,650,https://repository.library.noaa.gov/view/noaa/46448
+GB Cod,2021,420,,431,487,191,445,635,https://repository.library.noaa.gov/view/noaa/46448
+GB Haddock,2004,9745,,9838,11919,5100,9900,15000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2005,14484,,14533,15257,7590,15410,23000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2006,11984,,12043,13630,7480,14520,22000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2007,11890,,11948,12510,6270,12730,19000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2008,14781,,14818,16003,8050,14950,23000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2009,17585,,17648,19855,11100,18900,30000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2010,16578,,16593,18794,11988,17612,29600,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2011,11232,,11248,12646,9460,12540,22000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2012,5034,,5064,5633,6880,9120,16000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2013,4621,,4631,5066,3952,6448,10400,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2014,12936,,12953,14243,10530,16470,27000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2015,14631,,14648,16569,17800,19200,37000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2016,11935,,11943,12409,15170,21830,37000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2017,13377,,13384,13679,29500,20500,50000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2018,12216,,12221,12495,16000,24000,40000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2019,14164,,14168,14762,15000,15000,30000,https://repository.library.noaa.gov/view/noaa/33215
+GB Haddock,2020,11045,,11052,11724,16200,13800,30000,https://repository.library.noaa.gov/view/noaa/33215

@@ -1,9 +1,6 @@
 # Read in Production and Targeting coefficients to RDS  
 # Tested working. Make a small change if we want to get different regression results (there are 4 sets of models for each gear, we haven't picked a "best " model yet).
 
-
-
-
 ##########################
 # BEGIN readin of econometric model of production coefficients 
 ##########################
@@ -35,47 +32,26 @@ droppval<-function(working_coefs){
   }
   working_coefs
 }
-# 
-# # read in the estimated coefficients from txt files
-# production_coefs <- read.csv(file.path(rawpath,production_coef_pre), sep="\t", header=TRUE,stringsAsFactors=FALSE)
-# 
-# production_coefs<-zero_out(production_coefs,thresh)
-# production_coefs<-droppval(production_coefs)
-# 
-# 
-# # Drop out the p-values since we don't need them anymore. these are the odd columns 3:nc. Super ugly code, but works.
-# ## End zeroing out coefficients ##
-# 
-# 
-# 
-# #push the first column into the row names and drop that column
-# rownames(production_coefs)<-production_coefs[,1]
-# production_coefs<-production_coefs[,-1]
-# 
-# #transpose and send to dataframe, fix naming, and characters
-# production_coefs<-as.data.frame(t(production_coefs))
 
+### Code works for post-as-post and post-as-pre as long as the pre_process files are run separately  
+production_coefs <- read.csv(file.path(rawpath,production_coef_in), sep="\t", header=TRUE,stringsAsFactors=FALSE)
 
-### Repeat for the post coefs 
-
-production_coefs_post <- read.csv(file.path(rawpath,production_coef_in), sep="\t", header=TRUE,stringsAsFactors=FALSE)
-
-production_coefs_post<-zero_out(production_coefs_post,thresh)
-production_coefs_post<-droppval(production_coefs_post)
+production_coefs<-zero_out(production_coefs,thresh)
+production_coefs<-droppval(production_coefs)
 
 #push the first column into the row names and drop that column
-rownames(production_coefs_post)<-production_coefs_post[,1]
-production_coefs_post<-production_coefs_post[,-1]
+rownames(production_coefs)<-production_coefs[,1]
+production_coefs<-production_coefs[,-1]
 #transpose and send to dataframe, fix naming, and characters
-production_coefs_post<-as.data.frame(t(production_coefs_post))
+production_coefs<-as.data.frame(t(production_coefs))
 # 
 # ### Bring together 
 # production_coefs[setdiff(names(production_coefs_post), names(production_coefs))] <- NA
 # production_coefs_post[setdiff(names(production_coefs), names(production_coefs_post))] <- NA
-production_coefs<-production_coefs_post
+#production_coefs<-production_coefs_post
 #production_coefs<-rbind(production_coefs,production_coefs_post)
 
-rm(production_coefs_post)
+#rm(production_coefs_post)
 #take the rownames, push them into a column, and make sure they are characters. un-name the rows
 model <- rownames(production_coefs)
 production_coefs<-cbind(model,production_coefs)

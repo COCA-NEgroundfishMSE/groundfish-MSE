@@ -79,13 +79,7 @@ source('processes/Rfun_BmsySim.R')
 source('processes/genBaselineACLs.R')
 
 #Input data location for economic models
-econdatapath <- 'data/data_processed/econ'
-
-                            # Reults folders for economic models. Create them if necessary
-econ_results_location<-"results/econ/raw"
-dir.create('results/econ/raw', showWarnings = FALSE, recursive=TRUE)
-dir.create('results/sim', showWarnings = FALSE, recursive=TRUE)
-dir.create('results/fig', showWarnings = FALSE, recursive=TRUE)
+econdatapath <- here("data","data_processed","econ")
 
 # If running on a local machine, more than one repetition should be
 # used otherwise some plotting functions (e.g., boxplots) will fail
@@ -142,8 +136,8 @@ for(i in 1:nstock){
 names(stock) <- stockNames
 
 
-# Set up a container dataframe for Fleet-level Economic Results
-# These are simulation specific so they are stored in a single dataframe
+# Set up a container list for Economic Results
+# Unlike the stock list, These are simulation specific so they are stored in a single list
 source('processes/genEcon_Containers.R')
 
 
@@ -157,20 +151,39 @@ if(fyear < mxModYrs){
              'each stock'))
 }
 
+# Code to get the HPCC or NEFSC Neptune server ready to run ASAP.                            
 if (platform == 'Linux'){
-  if(!file.exists('../EXE/ASAP3.EXE')){
+  if(!file.exists('../EXE/ASAP3.EXE') & runClass=='HPCC'){
     warning(paste('ASAP3.EXE should be loaded in a directory EXE in the parent',
                'directory of groundfish-MSE -- i.e., you need an EXE',
                'directory in the same directory as Rlib and EXE must contain',
                'ASAP3.EXE', sep='\n'))
   }
-  rand <- sample(1:10000, 1)
-  tempwd <- getwd()
-  rundir <- paste(tempwd, "/assessment/ASAP/Run", '_', rand, sep = "")
-  dir.create(path = rundir)
-  from.path <- paste('../EXE/ASAP3.EXE', sep = "")
-  to.path   <- paste(rundir, sep= "")
-  file.copy(from = from.path, to = to.path)
   
+  
+  asap_model_num<-1
+  rundir<-here("assessment","ASAP",paste0("Run_",asap_model_num))
+  # if the folder Run_1 exists, increment by 1 and check again. When it does not exist, create the directory.
+  while(dir.exists(rundir)==TRUE){
+    asap_model_num<-asap_model_num+1
+    rundir<-here("assessment","ASAP",paste0("Run_",asap_model_num))
+  }
+  
+  dir.create(file.path(rundir), showWarnings = FALSE, recursive=TRUE)
+  
+    
+  # setup command to run ASAP.
+  if(runClass=='mleeContainer'){
+    from.path<-"/home/mlee/ADMB_12.3/admb/ASAP3"
+  } else if(runClass=='HPCC'){
+    from.path<- paste('../EXE/ASAP3.EXE', sep = "")
+  } else{
+    warning(paste('Unknown Linux runClass.',
+                  'You will not be able to find ASAP',
+                  'Modify runSetup.R', sep='\n', immediate.=TRUE))
+  }   
+
+  file.copy(from = from.path, to = rundir)
+
 }
 

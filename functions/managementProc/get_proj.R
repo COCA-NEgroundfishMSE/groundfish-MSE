@@ -120,7 +120,7 @@ get_proj <- function(type, parmgt, parpop, parenv, Rfun,
     Recruits<-parpop$R
 
     N[1,1] <- prod(tail(Recruits,5))^(1/5)
-    if (mproc$rhoadjust==TRUE & y>fmyearIdx & stockEnv$Mohns_Rho_SSB[y]>0.15){
+    if (mproc$rhoadjust[m]==TRUE & y>fmyearIdx & stockEnv$Mohns_Rho_SSB[y]>0.15){
       N[1,]<-N[1,]/(1+stockEnv$Mohns_Rho_SSB[y])
     }
   }

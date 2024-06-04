@@ -1,0 +1,1044 @@
+---
+title: "Figure Plots"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library("here")
+here::i_am("postprocessing/economic/figure_plot.Rmd")
+source(here("processes","get_runinfo.R"))
+
+source(here("processes","loadLibs.R"))
+
+
+
+library("knitr")
+library("viridis")
+  #library("kableExtra")
+library("tidyverse")
+library("data.table")
+options(knitr.kable.NA = '')
+knitr::opts_chunk$set(echo = TRUE)
+
+mprocfile<-"mprocEcon.csv"
+
+#file_to_readin<-"results_2023-06-16-14-03-14"
+#file_to_readin<-"results_2023-06-27-16-57-45"
+
+# This depends on something in  
+
+yr1<- 1851 
+
+# load all the functions
+
+ffiles <- list.files(path=here("functions"),full.names=TRUE, recursive=TRUE)
+invisible(sapply(ffiles, source))
+
+
+```
+
+
+```{r auto_readin_path, include=FALSE, eval=TRUE}
+# Run this to get results from the most recent path.
+#Setup paths, define things to graph.
+  file_dirs<-list.dirs(path=here(), recursive=FALSE)
+
+
+    file_dirs = do.call(rbind, lapply(file_dirs, function(xx) {
+    xx = as.data.frame(xx, stringsAsFactors=F)
+    names(xx) = "dirname" 
+    return(xx) }) )      
+  
+  file_dirs$stub = sapply(file_dirs$dirname, USE.NAMES=F, function(zz) {
+    temp = do.call(rbind,strsplit(as.character(zz), split = "/"))
+    return(temp[NCOL(temp)]) })
+  
+  file_dirs<-file_dirs %>%
+        dplyr::filter(stringr::str_detect(stub, "^results_"))
+
+  st<-max(file_dirs$stub)
+
+```
+
+
+```{r manual_readin_path, include=FALSE, eval=FALSE}
+# Run this to get results from the most recent path.
+#Setup paths, define things to graph.
+     st<-file_to_readin
+```
+
+```{r setup_paths, include=FALSE}
+
+GBC_path<-here(st,"fig","codGB")
+GMC_path<-here(st,"fig","codGOM")
+GBY_path<-here(st,"fig","yellowtailflounderGB")
+GBH_path<-here(st,"fig","haddockGB")
+pollock_path<-here(st,"fig","pollock")
+SIM_path<-here(st,"fig","simulation")
+
+
+
+traj_types<-c("SSB","ACL", "F_full", "F_fullAdvice","relE_SSB", "sumCW", "OFdStatus", "OFgStatus")
+box_types<-c("F_full_2025-2030", "F_full_2035-2040", "SSB_2025-2030", "SSB_2035-2040")
+
+sim_traj_types<-c("Shannon_fleet", "total_modeled_rev", "HHI_fleet", "Gini_fleet")
+sim_box_types<-c("Shannon_fleet_2025-2030","Shannon_fleet_2035-2040", "total_modeled_rev_2025-2030", "total_modeled_rev_2035-2040")
+
+```
+
+```{r load_in_mproc_and_om, include=FALSE}
+#load om_parameters
+source(here(st,"set_om_parameters_global.R"))
+
+#reconstruct the yrs vector and fmyearIdx.
+yrs<-yr1:mxyear
+fmyearIdx<-which(yrs==fmyear)
+
+
+#load and tidy mproc
+mproc <- read.csv(here(st,"fig",mprocfile), header=TRUE,
+                    stringsAsFactors=FALSE)
+mproc<-cbind(1:nrow(mproc), mproc)
+colnames(mproc)[1] <- "Model Number"
+mproc<-cbind(mproc,st)
+colnames(mproc)[ncol(mproc)] <- "ResultFile"
+
+
+# read in results file from omvalGlobal
+omvalGlobal_filename<-list.files(path=here(st,"sim"), pattern="^omvalGlobal", recursive=FALSE)
+flLst <- list()
+
+omvalGlobal_stack<-list()
+# If there is just one omvalGlobal, read it into the object omvalGlobal_stack
+if(length(omvalGlobal_filename)==1){
+  load(here(st,"sim", omvalGlobal_filename[1]))
+  flLst[[1]] <- omvalGlobal
+
+} else if(length(omvalGlobal_filename)>1){ 
+# If there is more than one  omvalGlobal, you have to stack them together.
+
+for(i in 1:length(omvalGlobal_filename)){
+  load(here(st,"sim", omvalGlobal_filename[i]))
+  flLst[[i]] <- omvalGlobal
+#  names(flLst[[i]]) <- names(omvalGlobal)
+  omvalGlobal<-NULL
+}
+for(i in 1:length(flLst[[1]])){
+
+  omval <- get_simcat(x=lapply(flLst, '[[', i ), along_dim=1)
+  names(omval) <- names(flLst[[1]][[i]])
+  stknm <- names(flLst[[1]])[i]
+  
+  # The "year" list element in omval is for plotting and needs to be
+  # only the length of the number of years -- unlike the other categories
+  # this doesn't change. So plotting doesn't get result in errors, change
+  # the dimensions of this list element
+  omval[['YEAR']] <- omval[['YEAR']][1:(length(omval[['YEAR']])/length(flLst))]
+  
+  omvalGlobal_stack[[i]]<-omval
+  omval<-NULL
+  
+}
+omvalGlobal<-omvalGlobal_stack
+omvalGlobal_stack<-NULL
+names(omvalGlobal)<-names(flLst[[1]])
+}
+
+ds<-NULL
+
+
+
+
+
+
+# SSBest doesn't have the dimensions that I was expecting.
+sim_level_mets<-c("ie_F_hat", "ie_F", "ie_bias", "iebias_hat")
+year_level_mets<-c("F_fullAdvice", "F_full", "SSB", "ACL", "sumCW","OFdStatus","OFgStatus", "SSBPROXY")
+
+out_sim<-list()
+out_year<-list()
+
+
+# A terrible loop  -- loop over the entries in omvalGlobal to extract yearly results and put them into a rectangular dataset. 
+for(i in 1:length(omvalGlobal)){
+  out_yeart<-list()
+  
+  for(m in 1:length(year_level_mets)){
+    out_yeart[[m]]<-get_yearly_results(metric=year_level_mets[m], stocknum=i)
+    temp<-do.call(rbind,out_yeart)
+    out_year[[i]]<-temp %>%
+      tidyr::pivot_wider(names_from=metric, values_from=value)
+    }
+}
+
+ds<-do.call(rbind,out_year)
+
+ds<-ds %>%
+  mutate(year=yrs[year])%>%
+  mutate(stock=str_replace(stock,"american",""))%>%
+  mutate(stock=str_replace(stock,"flounder","")) %>%
+  mutate(ACL=ACL/1000) %>%
+  mutate(SSB=SSB/1000) %>%
+  mutate(sumCW=sumCW/1000) %>%
+ #dplyr::filter(mproc==1) %>%
+ #dplyr::filter(stock=="codGB") %>%
+  dplyr::filter(year>=2018) %>%
+  mutate(mproc=as_factor(mproc)) %>%
+  rename(Simulated_SSB=SSB) %>%
+  arrange(stock,mproc, replicate, year)
+
+# A terrible loop  -- loop over the entries in omvalGlobal to extract simulation results and put them into a rectangular dataset. 
+
+for(i in 1:length(omvalGlobal)){
+  out_simt<-list()
+  
+  for(m in 1:length(sim_level_mets)){
+    out_simt[[m]]<-get_simlevel_results(metric=sim_level_mets[m], stocknum=i)
+    temp<-do.call(rbind,out_simt)
+    out_sim[[i]]<-temp %>%
+      tidyr::pivot_wider(names_from=metric, values_from=value)
+    }
+}
+
+ml<-do.call(rbind,out_sim)
+
+# Process the model-level results a little differently. Smash together the ie_F and ie_bias. This depends on the entries of mproc, so take a look a that.
+  m1<-ml %>%
+    dplyr::filter(mproc==5)%>%
+    select(replicate, mproc, stock, ie_F=ie_F_hat, ie_bias=iebias_hat)
+  
+  m23<-ml %>%
+    dplyr::filter(mproc != 5)%>%
+    select(replicate, mproc, stock, ie_F, ie_bias)
+
+  m123<-rbind(m1,m23)
+
+  m1<-NULL
+  m23<-NULL
+
+
+
+ds2<-ds %>%
+  dplyr::filter(replicate>=40)%>%
+  dplyr::filter(replicate<70) #%>%
+#  dplyr::filter(mproc %in%c(1,3,4,6))
+
+
+
+
+summary_stats <-ds %>%
+  dplyr::filter(year>=fmyear) %>%
+  group_by(stock, mproc) %>%
+  summarize(p10ACL = quantile(ACL, 0.10),
+            medianACL = median(ACL),
+            p90ACL = quantile(ACL, 0.90),
+            p10SSB = quantile(Simulated_SSB,.1),
+            medianSSB = median(Simulated_SSB),
+            p90SSB = quantile(Simulated_SSB,.90)
+  )
+
+summary_stats
+
+
+
+# Note, the Economic model has a ie_bias and ie_F, but those are not used. An "internal" model will get the ie_F_hat from the previous model.  So, you only need to look at ie_bias , ie_f, iebias_hat, and ie_F_hat from mproc=1  
+  
+# Get   
+  
+```
+
+
+
+```{r print_mproc, include=TRUE, echo=FALSE}
+kable(t(mproc),caption =  "contents of mproc file.")
+```
+I simulated from 2020-2040.  I think I have about 80 repliates.  Here is a short description of each of the Management procedures:
+
+
+A note on the implementation error estimation: 
+To estimate the implementation error, I use the F_full and F_fullAdvice from an economic model for a single model run for the duration of the management regime, in this case from 2020-2040. I estimate the ie_bias parameter (intuitively, this is the average difference between F_full and F_fullAdvice) and the ie_F parameter (intuitively, this is the related to the variance left over) under the assumption of log-normally distributed errors.   I then pass these parameters to the standard fisheries models.
+
+
+```{r display_model_chars, include=TRUE, echo=TRUE}
+
+nrep
+
+
+```
+
+\newpage
+
+# Georges Bank Cod
+
+```{r codGB_traj, eval=TRUE, fig.show = "hold", out.width = "48%", fig.align = "center", echo=FALSE, fig.cap="\\label{figure:codGB_traj} Select GB Cod Mean/Median.  "}
+
+knitr::include_graphics(file.path(GBC_path, "Traj", traj_types, "codGB_MPMeanTraj.jpg"))
+
+```
+
+
+```{r codGB_box, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{codGB_box} GB Cod box plots for F\\_Full (top) and  SSB (bottom).  ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(GBC_path, paste0(box_types,".jpg") ) )
+
+```
+
+
+
+
+
+
+```{r plot_GBcod_catch,  fig.cap="GB cod Catch"}
+ ds2 %>%dplyr::filter(stock=="codGB") %>% ggplot(data=., aes(x=year, y=sumCW, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+```{r plot_GBcod_ACL,  fig.cap="GB cod ACL"}
+ ds2 %>%dplyr::filter(stock=="codGB") %>% ggplot(data=., aes(x=year, y=ACL, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+```{r plot_GBcod_SSB,  fig.cap="GB cod SSB"}
+ ds2 %>%dplyr::filter(stock=="codGB") %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+```{r plot_GBcod_FFA,  fig.cap="GB cod SSB"}
+ ds2 %>%dplyr::filter(stock=="codGB") %>% ggplot(data=., aes(x=year, y=F_fullAdvice, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+\newpage
+# Pollock 
+
+
+```{r Pollock_traj, eval=TRUE, fig.show = "hold", out.width = "48%",  fig.align = "center", echo=FALSE, fig.cap="\\label{fig:pollock_traj} Select Pollock  Mean/Median.  "}
+
+knitr::include_graphics(file.path(pollock_path, "Traj", traj_types, "pollock_MPMeanTraj.jpg"))
+
+```
+
+
+```{r Pollock_box, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{Pollock_box} Pollock box plots for F\\_Full (top) and  SSB (bottom).  ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(pollock_path, paste0(box_types,".jpg") ) )
+
+```
+
+
+
+
+
+```{r plot_Pollock_catch,  fig.cap="GB cod Catch"}
+ ds2 %>%dplyr::filter(stock=="pollock") %>% ggplot(data=., aes(x=year, y=sumCW, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+```{r plot_Pollock_ACL,  fig.cap="GB cod ACL"}
+ ds2 %>%dplyr::filter(stock=="pollock") %>% ggplot(data=., aes(x=year, y=ACL, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+```{r plot_Pollock_SSB,  fig.cap="GB cod SSB"}
+ ds2 %>%dplyr::filter(stock=="pollock") %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+```{r plot_Pollock_FFA,  fig.cap="GB cod SSB"}
+ ds2 %>%dplyr::filter(stock=="pollock") %>% ggplot(data=., aes(x=year, y=F_fullAdvice, group=mproc, color=mproc)) +
+  geom_line() +
+  theme(axis.text.x = element_text(angle = 45)) +
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+\newpage
+
+# Georges Bank haddock
+
+
+
+```{r GBhaddock_traj, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{GBhaddock} Select GB haddock Mean/Median. ",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(GBH_path, "Traj", traj_types, "haddockGB_MPMeanTraj.jpg"))
+
+```
+
+
+
+```{r GBhaddock_box, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{GBhaddock_box} GB Haddockbox plots for F\\_Full (top) and  SSB (bottom).  ",  fig.align = "center", echo=FALSE}
+knitr::include_graphics(file.path(GBH_path, paste0(box_types,".jpg") ) )
+
+```
+
+
+
+
+
+
+```{r plot_GBhaddock_catch,  fig.cap="GB haddock Catch"}
+ ds2 %>%dplyr::filter(stock=="haddockGB") %>% ggplot(data=., aes(x=year, y=sumCW, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+```{r plot_haddockGB_ACL,  fig.cap="GB haddock ACL"}
+ ds2 %>%dplyr::filter(stock=="haddockGB") %>% ggplot(data=., aes(x=year, y=ACL, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) +
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+```{r plot_haddockGB_SSB,  fig.cap="GB haddock SSB"}
+ ds2 %>%dplyr::filter(stock=="haddockGB") %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+```{r plot_haddockGB_FFA,  fig.cap="GB haddock SSB"}
+ ds2 %>%dplyr::filter(stock=="haddockGB") %>% ggplot(data=., aes(x=year, y=F_fullAdvice, group=mproc, color=mproc)) +
+  geom_line() +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+\newpage
+
+# Gulf of Maine Cod
+
+
+
+```{r GOMCod_traj, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{GOMCod_traj} Select GOM Cod Mean/Median.  ",  fig.align = "center", echo=FALSE}
+
+
+knitr::include_graphics(file.path(GMC_path, "Traj", traj_types, "codGOM_MPMeanTraj.jpg"))
+
+```
+
+
+
+
+```{r GOMCod_box, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{GOMCod_box} GOM Cod box plots  for F\\_Full (top) and  SSB (bottom).  ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(GMC_path, paste0(box_types,".jpg") ) )
+
+```
+
+
+
+
+
+```{r plot_codGOM_catch,  fig.cap="GOM Cod Catch"}
+ ds2 %>%dplyr::filter(stock=="codGOM") %>% ggplot(data=., aes(x=year, y=sumCW, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+```{r  plot_codGOM_ACL,  fig.cap="GOM Cod ACL"}
+ ds2 %>%dplyr::filter(stock=="codGOM") %>% ggplot(data=., aes(x=year, y=ACL, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+```{r  plot_codGOM_SSB,  fig.cap="GOM Cod SSB"}
+ ds2 %>%dplyr::filter(stock=="codGOM") %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) +
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+```{r  plot_codGOM_FFA,  fig.cap="GOM Cod SSB"}
+ ds2 %>%dplyr::filter(stock=="codGOM") %>% ggplot(data=., aes(x=year, y=F_fullAdvice, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+\newpage
+
+# GB Yellowtail Flounder  
+
+
+```{r GBytf_traj, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{GBytf} Select GB Yellowtail Mean/Median. ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(GBY_path, "Traj", traj_types, "yellowtailflounderGB_MPMeanTraj.jpg"))
+
+```
+
+
+
+
+
+```{r GBytf_box, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{GBytf_box} GB Yellowtail box plots  for F\\_Full (top) and  SSB (bottom). ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(GBY_path, paste0(box_types,".jpg") ) )
+
+```
+
+
+
+```{r plot_yellowtailGB_catch,  fig.cap="yellowtailGB  Catch"}
+ ds2 %>%dplyr::filter(stock=="yellowtailGB") %>% ggplot(data=., aes(x=year, y=sumCW, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+
+
+```{r  plot_yellowtailGB_ACL,  fig.cap="yellowtailGB ACL"}
+ ds2 %>%dplyr::filter(stock=="yellowtailGB") %>% ggplot(data=., aes(x=year, y=ACL, group=mproc, color=mproc)) +
+  geom_line() +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+```{r  plot_yellowtailGB_SSB,  fig.cap="yellowtailGB SSB"}
+ ds2 %>%dplyr::filter(stock=="yellowtailGB") %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+
+
+```{r  plot_yellowtailGB_FFA,  fig.cap="yellowtailGB SSB"}
+ ds2 %>%dplyr::filter(stock=="yellowtailGB") %>% ggplot(data=., aes(x=year, y=F_fullAdvice, group=mproc, color=mproc)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_wrap(vars(replicate))#+ 
+#  theme(legend.position = "none")
+
+```
+
+
+\newpage
+
+
+
+# Simulation Level Figures  
+
+
+```{r SimLevel, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{SimLevel} Simulation Level Figures ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(SIM_path, "Traj", sim_traj_types, "SIM_MPMeanTraj.jpg"))
+
+```
+
+
+
+```{r SimLevelbox, eval=TRUE, fig.show = "hold", out.width = "48%", fig.cap="\\label{SimLevel_box} Simulation Level boxplots ",  fig.align = "center", echo=FALSE}
+
+knitr::include_graphics(file.path(SIM_path, "boxplot", paste0(sim_box_types,".jpg") ) )
+
+```
+
+
+\newpage
+
+
+
+# Individual Trajectories
+
+
+
+```{r plot_catch}
+
+ggplot(data=ds2, aes(x=year, y=sumCW, group=replicate, color=replicate)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_grid(rows = vars(stock), scales = "free", cols = vars(mproc)) + 
+  theme(legend.position = "none")
+
+
+
+```
+
+
+```{r plot_acls}
+
+ggplot(data=ds2, aes(x=year, y=ACL, group=replicate, color=replicate)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_grid(rows = vars(stock), scales = "free", cols = vars(mproc)) + 
+  theme(legend.position = "none")
+
+
+
+```
+
+
+
+```{r plot_SSB, fig.cap="SSB Trajectories for each stock"}
+ggplot(data=ds2, aes(x=year, y=Simulated_SSB, group=replicate, color=replicate)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_grid(rows = vars(stock), scales = "free", cols = vars(mproc)) + 
+  theme(legend.position = "none")
+
+```
+
+
+
+```{r plot_FFullAdvice, fig.cap="F_full advice trajectories for each stock. The up-and-down for GB haddock is particularly surprising"}
+ggplot(data=ds2, aes(x=year, y=F_fullAdvice, group=replicate, color=replicate)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_grid(rows = vars(stock), scales = "free", cols = vars(mproc)) + 
+  theme(legend.position = "none")
+
+```
+
+
+
+```{r plot_FFull, fig.cap="F_full trajectories for each stock."}
+ggplot(data=ds2, aes(x=year, y=F_full, group=replicate, color=replicate)) +
+  geom_line()  +
+  theme(axis.text.x = element_text(angle = 45)) + 
+  facet_grid(rows = vars(stock), scales = "free", cols = vars(mproc)) + 
+  theme(legend.position = "none")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r plot_gomCOD_OFgStatus,  fig.cap="GOM cod overfishing status and F_full advice (blue dashed) trajectories for the first 10 replicates", eval=FALSE}
+OFgStatus<-ds2%>%
+  dplyr::filter(stock=="codGOM")%>%
+  dplyr::filter(replicate<50)%>%
+  ggplot(data=., aes(x=year, y=OFgStatus)) +
+    geom_line() +
+    geom_line(aes(y = F_fullAdvice), color="steelblue", linetype="twodash") +
+  facet_grid(rows = vars(replicate), cols = vars(mproc))+
+    theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank()  #remove y axis ticks
+        ) + 
+    theme(strip.text.y = element_blank())
+
+
+OFgStatus
+
+```
+
+
+
+```{r plot_manySSB,  fig.cap="SSB. Stocks in the Columns, Replicates in the Rows"}
+
+
+ds2 %>%dplyr::filter(mproc!=3) %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate,stock), scales="free_y", ncol=5)+
+    theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),  #remove y axis ticks
+        axis.text.x = element_text(angle = 45),
+   strip.text.x = element_blank(),
+    strip.text.y = element_blank()
+        ) 
+#  theme(legend.position = "none")
+
+
+
+```
+
+
+```{r plot_manycatch,  fig.cap="Catch. Stocks in the Columns, Replicates in the Rows"}
+ds2 %>%dplyr::filter(mproc!=3) %>% ggplot(data=., aes(x=year, y=sumCW, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate,stock), scales="free_y", ncol=5)+
+    theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),  #remove y axis ticks
+        axis.text.x = element_text(angle = 45),
+    strip.text.x = element_blank(),
+    strip.text.y = element_blank()
+        ) 
+#  theme(legend.position = "none")
+```
+
+
+
+
+
+```{r plot_manyACL,  fig.cap="ACLs. Stocks in the Columns, Replicates in the Rows"}
+
+
+ds2 %>%dplyr::filter(mproc!=3) %>% ggplot(data=., aes(x=year, y=ACL, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate,stock), scales="free_y", ncol=5)+
+    theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),  #remove y axis ticks
+        axis.text.x = element_text(angle = 45),
+    strip.text.x = element_blank(),
+    strip.text.y = element_blank()
+        ) 
+#  theme(legend.position = "none")
+
+
+
+```
+
+```{r plot_manyF_Full,  fig.cap="F Full.  Stocks in the Columns, Replicates in the Rows"}
+
+
+ds2 %>%dplyr::filter(mproc!=3) %>% ggplot(data=., aes(x=year, y=F_full, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_wrap(vars(replicate,stock), scales="free_y", ncol=5)+
+    theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),  #remove y axis ticks
+        axis.text.x = element_text(angle = 45),
+    strip.text.x = element_blank(),
+    strip.text.y = element_blank()
+        ) 
+#  theme(legend.position = "none")
+
+
+
+```
+
+
+```{r plot_many,  fig.cap="many ACLs", eval=FALSE}
+# Need to make the y_scales free, but that cannot be handled in facet_grid. Need to use facet_wrap instead. 
+
+ds2 %>% ggplot(data=., aes(x=year, y=Simulated_SSB, group=mproc, color=mproc)) +
+  geom_line() + 
+  facet_grid(scales="free", rows = vars(replicate), cols = vars(stock))+
+    theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),  #remove y axis ticks
+        axis.text.x = element_text(angle = 45),
+        ) + 
+    theme(strip.text.y = element_blank())
+#  theme(legend.position = "none")
+
+
+
+```
+
+
+
+```{r plot_yellowtailGB_OFgStatus,  fig.cap="GB yellowtail overfishing status and F_full advice (blue dashed) trajectories for the first 10 replicates"}
+OFgStatus<-ds2%>%
+  dplyr::filter(stock=="yellowtailGB")%>%
+  dplyr::filter(replicate<50)%>%
+  ggplot(data=., aes(x=year, y=OFgStatus)) +
+  geom_line() + 
+  geom_line(aes(y = F_fullAdvice), color="steelblue", linetype="twodash") +
+  facet_grid(rows = vars(replicate), cols = vars(mproc))+
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),
+        axis.text.x = element_text(angle = 45)
+        ) + 
+    theme(strip.text.y = element_blank())
+
+OFgStatus
+
+```
+
+
+```{r plot_gomCOD_OFdStatus,  fig.cap="GOM cod overfished status and F_full advice (blue dashed) trajectories for the first 10 replicates"}
+OFdStatus<-ds2%>%
+  dplyr::filter(stock=="codGOM")%>%
+  dplyr::filter(replicate<50)%>%
+  ggplot(data=., aes(x=year, y=OFdStatus)) +
+  geom_line() + 
+  geom_line(aes(y = F_fullAdvice), color="steelblue", linetype="twodash") +
+  facet_grid(rows = vars(replicate), cols = vars(mproc))+
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),
+        axis.text.x = element_text(angle = 45)
+        ) + 
+    theme(strip.text.y = element_blank())
+
+OFdStatus
+
+```
+
+
+```{r plot_yellowtailGB_OFdStatus,  fig.cap="GB yellowtail  overfished status and F_full advice (blue dashed) trajectories for the first 10 replicates"}
+OFdStatus<-ds2%>%
+  dplyr::filter(stock=="yellowtailGB")%>%
+  dplyr::filter(replicate<50)%>%
+  ggplot(data=., aes(x=year, y=OFdStatus)) +
+  geom_line() + 
+  geom_line(aes(y = F_fullAdvice), color="steelblue", linetype="twodash") +
+  facet_grid(rows = vars(replicate), cols = vars(mproc))+
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),
+                axis.text.x = element_text(angle = 45)
+        )
+OFdStatus
+
+```
+
+
+
+
+
+
+```{r haddockGB_overfishing,  fig.cap="GB haddock  overfishing status and F_full advice (blue dashed) trajectories for the first 10 replicates"}
+OFgStatus<-ds2%>%
+  dplyr::filter(stock=="haddockGB")%>%
+  dplyr::filter(replicate<50)%>%
+  ggplot(data=., aes(x=year, y=OFgStatus)) +
+  geom_line() + 
+  geom_line(aes(y = F_fullAdvice), color="steelblue", linetype="twodash") +
+  facet_grid(rows = vars(replicate), cols = vars(mproc))+
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),
+                axis.text.x = element_text(angle = 45)
+        )
+OFgStatus
+
+```
+
+
+
+
+```{r haddockGB,  fig.cap="GB haddock  overfished status and F_full advice (blue dashed) trajectories for the first 10 replicates"}
+OFdStatus<-ds2%>%
+  dplyr::filter(stock=="haddockGB")%>%
+  dplyr::filter(replicate<50)%>%
+  ggplot(data=., aes(x=year, y=OFdStatus)) +
+  geom_line() + 
+  geom_line(aes(y = F_fullAdvice), color="steelblue", linetype="twodash") +
+  facet_grid(rows = vars(replicate), cols = vars(mproc))+
+  theme(axis.text.y=element_blank(),  #remove y axis labels
+        axis.ticks.y=element_blank(),
+                axis.text.x = element_text(angle = 45)
+        )
+OFdStatus
+
+```
+
+
+# Implementation Error
+
+
+```{r boxplot:ie_bias}
+# This code is pretty fragile
+
+  ggplot(data=m123, aes(x=mproc, y=ie_bias, fill=factor(mproc))) +
+    geom_boxplot() +
+    facet_wrap(~stock)
+```
+
+
+
+```{r boxplot:ie_F}
+# This code is pretty fragile
+
+  ggplot(data=m123, aes(x=mproc, y=ie_F, fill=factor(mproc))) +
+    geom_boxplot() +
+    facet_wrap(~stock)
+```
+
+#  Closures
+
+
+```{r readin_closures, include=FALSE, eval=FALSE}
+
+#selects just the econ_2023 datasets
+file_names = list.files(path=here(st,"econ", "raw"), 
+                        pattern = "econ_fishery_status_2023", full.names = TRUE)
+
+#binding into a data.table
+fishery_status = (lapply(file_names, fread, stringsAsFactors = FALSE))
+fishery_status = rbindlist(fishery_status)
+
+setnames(fishery_status, old="r", new="replicate")
+setnames(fishery_status, old="m", new="model")
+
+setcolorder(fishery_status, c("year", "model", "replicate", "spstock2", "doffy" ))
+
+
+# Pull the last day of the year
+last_day<-fishery_status[doffy==365, ]      
+
+# Pull the last day of the year for stocks with a biological model
+bio_model<-last_day[bio_model==1, ]                            
+
+
+# Pull all the closed info stocks 
+closed<-fishery_status[underACL==FALSE, ]                            
+
+# Just get the first day they are closed.
+date_closed <-closed %>%
+  group_by(replicate, model, year,spstock2)%>%
+  slice(which.min(doffy))%>%
+  ungroup() %>%
+  mutate(spstock2=str_replace(spstock2,"american",""))%>%
+  mutate(spstock2=str_replace(spstock2,"flounder",""))
+
+
+
+
+
+
+
+
+stock_year_closures<-table(date_closed$year, date_closed$spstock2)
+
+# Just pull a few reps
+wider <-date_closed %>%
+  select("year", "model", "replicate", "spstock2", "doffy", "sectorACL", "SSB")%>%
+  rename(closure=doffy)%>%
+  dplyr::filter(replicate<=5)%>%
+  ungroup()
+
+SSB<-wider %>%
+  select("year", "replicate", "spstock2", "SSB") %>%
+    pivot_wider( names_from=spstock2, values_from=c(SSB))
+
+
+acls<-wider %>%
+  select("year", "replicate", "spstock2","sectorACL") %>%
+    pivot_wider( names_from=spstock2, values_from=c(sectorACL))
+
+
+closure_date<-wider %>%
+  select("year", "replicate", "spstock2","closure") %>%
+    pivot_wider( names_from=spstock2, values_from=closure)
+
+
+
+```
+\newpage
+
+This sections is mostly to look at which stocks were closed and eyeball if they make sense.  By replicate and tear, we can look at which stocks were closed and when that occurred. For these two model runs, we're getting Plaice to close things down "late" in the fishing year. This is pretty reasonable. We are are also getting GOM cod to shut down fairly early in the fishing year. If GOM Cod ACL doesn't bind, then we are getting GOM Haddock to bind. Once, we get GB cod to bind in the first year.
+
+
+
+
+
+
+```{r print_stockyear_closures, include=TRUE, echo=FALSE, eval=FALSE}
+kable(stock_year_closures,caption =  "Stock and year closures")
+```
+
+
+
+```{r closure_date_table, include=TRUE, echo=FALSE, eval=FALSE}
+kable(closure_date,caption =  "Dates of closure. Day=1 is May 1.  Day 365=April 30")
+```
+
+
+
+```{r ACLs, include=TRUE, echo=FALSE, eval=FALSE}
+kable(acls,caption =  " Sector sub-ACLs. These only print when the catch limit is hit by the modeled fleet.")
+```
+
+
+
+

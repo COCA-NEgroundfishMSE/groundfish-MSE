@@ -1,0 +1,207 @@
+---
+title: "Export Results "
+output:
+  pdf_document: default
+  html_document: default
+---
+
+
+# Descriptions
+
+This is just code to pull things out of omvalGlobal and save as a dataset, so I can do econometrics in stata.
+```{r setup, include=FALSE}
+library("here")
+here::i_am("postprocessing/economic/export_results.Rmd")
+source(here("processes","get_runinfo.R"))
+
+source(here("processes","loadLibs.R"))
+
+library("knitr")
+library("viridis")
+  #library("kableExtra")
+library("tidyverse")
+library("data.table")
+library("haven")
+options(knitr.kable.NA = '')
+knitr::opts_chunk$set(echo = TRUE)
+
+mprocfile<-"mprocEcon.csv"
+
+file_to_readin<-"results_2023-06-27-16-57-45"
+#file_to_readin<-"results_2023-07-18-14-26-18"
+
+#This depends on something in  
+yr1<- 1851 
+
+# load all the functions
+ffiles <- list.files(path=here("functions"), full.names=TRUE, recursive=TRUE)
+invisible(sapply(ffiles, source))
+
+```
+
+
+```{r auto_readin_path, include=FALSE, eval=TRUE}
+# Run this to get results from the most recent path.
+#Setup paths, define things to graph.
+  file_dirs<-list.dirs(path=here(), recursive=FALSE)
+
+
+    file_dirs = do.call(rbind, lapply(file_dirs, function(xx) {
+    xx = as.data.frame(xx, stringsAsFactors=F)
+    names(xx) = "dirname" 
+    return(xx) }) )      
+  
+  file_dirs$stub = sapply(file_dirs$dirname, USE.NAMES=F, function(zz) {
+    temp = do.call(rbind,strsplit(as.character(zz), split = "/"))
+    return(temp[NCOL(temp)]) })
+  
+  file_dirs<-file_dirs %>%
+        dplyr::filter(stringr::str_detect(stub, "^results_"))
+
+  st<-max(file_dirs$stub)
+
+```
+
+
+```{r manual_readin_path, include=FALSE, eval=TRUE}
+# Run this to get results from the most recent path.
+#Setup paths, define things to graph.
+     st<-file_to_readin
+```
+
+
+
+```{r load_in_mproc_and_om, include=FALSE}
+#load om_parameters
+source(here(st,"set_om_parameters_global.R"))
+
+#reconstruct the yrs vector and fmyearIdx.
+yrs<-yr1:mxyear
+fmyearIdx<-which(yrs==fmyear)
+
+
+#load and tidy mproc
+mproc <- read.csv(here(st,"fig",mprocfile), header=TRUE,
+                    stringsAsFactors=FALSE)
+mproc<-cbind(1:nrow(mproc), mproc)
+colnames(mproc)[1] <- "Model_Number"
+mproc<-cbind(mproc,st)
+colnames(mproc)[ncol(mproc)] <- "ResultFile"
+
+
+# read in results file from omvalGlobal
+omvalGlobal_filename<-list.files(path=here(st,"sim"), pattern="^omvalGlobal", recursive=FALSE)
+
+flLst <- list()
+
+omvalGlobal_stack<-list()
+# If there is just one omvalGlobal, read it into the object omvalGlobal_stack
+if(length(omvalGlobal_filename)==1){
+  load(here(st,"sim", omvalGlobal_filename[1]))
+
+} else if(length(omvalGlobal_filename)>1){ 
+# If there is more than one  omvalGlobal, you have to stack them together.
+
+for(i in 1:length(omvalGlobal_filename)){
+  load(here(st,"sim", omvalGlobal_filename[i]))
+  flLst[[i]] <- omvalGlobal
+#  names(flLst[[i]]) <- names(omvalGlobal)
+  omvalGlobal<-NULL
+}
+for(i in 1:length(flLst[[1]])){
+
+  omval <- get_simcat(x=lapply(flLst, '[[', i ), along_dim=1)
+  names(omval) <- names(flLst[[1]][[i]])
+  stknm <- names(flLst[[1]])[i]
+  
+  # The "year" list element in omval is for plotting and needs to be
+  # only the length of the number of years -- unlike the other categories
+  # this doesn't change. So plotting doesn't get result in errors, change
+  # the dimensions of this list element
+  omval[['YEAR']] <- omval[['YEAR']][1:(length(omval[['YEAR']])/length(flLst))]
+  
+  omvalGlobal_stack[[i]]<-omval
+  omval<-NULL
+  
+}
+omvalGlobal<-omvalGlobal_stack
+omvalGlobal_stack<-NULL
+names(omvalGlobal)<-names(flLst[[1]])
+}
+
+ds<-NULL
+
+
+
+
+
+
+
+sim_level_mets<-c("ie_F_hat", "ie_F", "ie_bias", "iebias_hat")
+year_level_mets<-c("F_fullAdvice", "F_full", "SSB", "ACL", "sumCW", "OFdStatus","OFgStatus", "SSBPROXY", "modeled_fleet_removals_mt", "avgprice_per_lb", "Gini_stock_within_season_BKS","Mohns_Rho_SSB","R")
+
+out_sim<-list()
+out_year<-list()
+
+
+# A terrible loop  -- loop over the entries in omvalGlobal to extract yearly results and put them into a rectangular dataset. 
+for(i in 1:length(omvalGlobal)){
+  out_yeart<-list()
+  
+  for(m in 1:length(year_level_mets)){
+    out_yeart[[m]]<-get_yearly_results(metric=year_level_mets[m], stocknum=i)
+    temp<-do.call(rbind,out_yeart)
+    out_year[[i]]<-temp %>%
+      tidyr::pivot_wider(names_from=metric, values_from=value)
+    }
+}
+
+ds<-do.call(rbind,out_year)
+
+ds<-ds %>%
+  mutate(year=yrs[year])%>%
+  mutate(stock=str_replace(stock,"american",""))%>%
+  mutate(stock=str_replace(stock,"flounder","")) %>%
+ #dplyr::filter(mproc==1) %>%
+ #dplyr::filter(stock=="codGB") %>%
+  mutate(model=st) %>%
+  rename(Simulated_SSB=SSB) %>%
+  arrange(stock,mproc, replicate, year)
+
+# A terrible loop  -- loop over the entries in omvalGlobal to extract simulation results and put them into a rectangular dataset. 
+
+for(i in 1:length(omvalGlobal)){
+  out_simt<-list()
+  
+  for(m in 1:length(sim_level_mets)){
+    out_simt[[m]]<-get_simlevel_results(metric=sim_level_mets[m], stocknum=i)
+    temp<-do.call(rbind,out_simt)
+    out_sim[[i]]<-temp %>%
+      tidyr::pivot_wider(names_from=metric, values_from=value)
+    }
+}
+
+ml<-do.call(rbind,out_sim)
+
+ml<-ml %>%
+  mutate(model=st)
+
+
+#Merge the management procedure table to the model results
+ds<-ds %>% inner_join(mproc, by=join_by(mproc==Model_Number))
+ml<-ml %>% inner_join(mproc, by=join_by(mproc==Model_Number))
+
+
+write_dta(ds, path=here(st,"yearly_results.dta"))
+write_dta(ml, path=here(st,"model_level_results.dta"))
+
+    
+# Note, the Economic model has a ie_bias and ie_F, but those are not used. An "internal" model will get the ie_F_hat from the previous model.  So, you only need to look at ie_bias , ie_f, iebias_hat, and ie_F_hat from mproc=1  
+  
+
+```
+
+
+
+
+

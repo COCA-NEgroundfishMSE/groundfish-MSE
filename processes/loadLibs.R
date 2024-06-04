@@ -26,7 +26,7 @@ if(runClass == 'HPCC'){
   require(tidyverse, lib.loc='../Rlib/')
   require(dplyr, lib.loc='../Rlib/')
   require(data.table, lib.loc='../Rlib/')
-  require(ASAPplots, lib.loc = '../Rlib')
+  require(simASAP, lib.loc = '../Rlib')
   require(fishmethods, lib.loc = '../Rlib')
   require(timeDate, lib.loc = '../Rlib')
   require(timeSeries, lib.loc = '../Rlib')
@@ -46,7 +46,7 @@ if(runClass == 'HPCC'){
     sapply(pkg, require, character.only = TRUE)
   }
 
-  pkg<-c("msm", "tmvtnorm", "TMB", "abind", "glue", "tidyverse", "dplyr", "data.table", "ASAPplots","fishmethods","timeSeries","fBasics","fGarch")
+  pkg<-c("msm", "tmvtnorm", "TMB", "abind", "glue", "tidyverse", "dplyr", "data.table", "simASAP","fishmethods","timeSeries","fBasics","fGarch")
   check.packages(pkg)
 
   require(msm)
@@ -57,11 +57,20 @@ if(runClass == 'HPCC'){
   require(tidyverse)
   require(dplyr)
   require(data.table)
-  require(ASAPplots)
+  if(runClass=='neptune'){
+    library(simASAP, lib.loc="/net/home2/mlee/R/x86_64_pc-linux-gnu-library")
+  }
+  else if (runClass=='mleeContainer'){
+    library(simASAP, lib.loc="/home/mlee/R/x86_64-pc-linux-gnu-library")
+  }
+{
+    require(simASAP)
+  }
   require(fishmethods)
   require(timeDate)
   require(timeSeries)
   require(fBasics)
   require(fGarch)
+  require(here)
 
 }

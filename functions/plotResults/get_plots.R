@@ -8,15 +8,16 @@
 #        particular plots (e.g., temperature time series)
 
 # boxnames, rpnames, trajnames: performance measures you want to plot
+# breakyears are is a vector of breakpoints defined as years after fmyearIdx.
+    # breakyears=c(5,10,15) will divide the the plots into years 
 
 
-
-get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
+get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames, breakyears=plotBrkYrs){
   
   with(stockEnv, {
     # load some of the necessary variables for plotting by running the
     # setup file.
-    source('modelParameters/set_om_parameters_global.R', local=TRUE)
+    source(file.path(ResultDirectory,"set_om_parameters_global.R"), local=TRUE)
     source('processes/genAnnStructure.R', local=TRUE)
     
     # Load one of the simulation environments
@@ -32,18 +33,17 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
     pyidx <- (fmyearIdx-py0+1):length(yrs)
     nm <- names(x)
     # ny <- dim(x[[i]])[3]
-    
+
     bxidx <-which(nm %in% boxnames)    
     rpidx <- which(nm %in% rpnames)
-    # index for trajectories to plot
     trajidx <-which(nm %in% trajnames)
 
-    
+
     #### Performance measure plots ####
 
     # Identify break points for selecting years to produce for each of the
     # boxplots and also names for each of the categories for printing
-    brkYrsIdx <- plotBrkYrs + fmyearIdx
+    brkYrsIdx <- breakyears + fmyearIdx
     brkYrsIdxExt <- c(0, brkYrsIdx, nyear)
     brkYrsNames <- yrs[c(1, brkYrsIdxExt)]
     brkYrsNames2 <- sapply(2:length(brkYrsNames), function(x) 
@@ -67,7 +67,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
             tempDat <- array(data=tempDatUnit, dim=dim(tempCW))
             dimnames(tempDat) <- dimnames(tempCW)
           }
-          jpeg(paste0(dirOut, nm[i], '_', brkYrsNames2[j], '.jpg.'))
+          jpeg(paste0(dirOut, nm[i], '_', brkYrsNames2[j], '.jpg'))
           
             if(all(is.na(tempDat))){
               plot(0)
@@ -86,7 +86,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
       dir.create(file.path(dirOut, 'RP'), showWarnings=FALSE)
       for(i in 1:dim(x$FPROXY)[2]){
       
-        jpeg(paste0(dirOut, 'RP/', 'mp', i, '.jpg.'))
+        jpeg(paste0(dirOut, 'RP/', 'mp', i, '.jpg'))
           
           if(all(is.na(x$FPROXY[,i,]))){
             plot(0)
@@ -99,7 +99,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
         
         # HCR plot not working -- got rid of RP. Not bothering to change
         # back right now because I don't think it was that useful of a plot.
-        # jpeg(paste0(dirOut, 'RP/', 'hcr', i, '.jpg.'))
+        # jpeg(paste0(dirOut, 'RP/', 'hcr', i, '.jpg'))
         # 
         #   get_hcrPlot(rp[,i,,])
         # 
@@ -119,7 +119,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
       #### Temperature time series ####
       
       # Time-series temperature plot
-      jpeg(paste0(dirOut, 'tempts.jpg.'),
+      jpeg(paste0(dirOut, 'tempts.jpg'),
            width=480*1.75, height=480, pointsize=12*1.5)
         get_tempTSPlot(temp = temp[yrs_temp %in% yrs], yrs = yrs,
                        fmyear=fmyear, ftyear=yrs[nburn+1])
@@ -127,7 +127,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
      
       #### Growth ####
       # Plot describing how growth changed over time
-      jpeg(paste0(dirOut, 'laa.jpg.'),
+      jpeg(paste0(dirOut, 'laa.jpg'),
            width=480*1.75, height=480, pointsize=12*1.5)
         ptyridx <- fmyearIdx:length(yrs)
         get_laaPlot(laa_par=laa_par, laa_typ=laa_typ, laafun=get_lengthAtAge, 
@@ -136,7 +136,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
       dev.off()
       
       # # Plot describing how average recruitment changed over time
-      jpeg(paste0(dirOut, 'SR.jpg.'),
+      jpeg(paste0(dirOut, 'SR.jpg'),
            width=480*1.75, height=480, pointsize=12*1.5)
   
         ptyridx <- fmyearIdx:length(yrs)
@@ -151,7 +151,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
       par(mar=c(4.5,4.5,1.5,1.5))
       
       # age-based selectivity plot
-      jpeg(paste0(dirOut, 'slxAge.jpg.'),
+      jpeg(paste0(dirOut, 'slxAge.jpg'),
            width=480*1.5, height=480, pointsize=12*1.5)
       
         get_slxPlot(ages = fage:page, type = 'age', 
@@ -161,7 +161,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
       dev.off()
       
       # length-based selectivity plot
-      jpeg(paste0(dirOut, 'slxLength.jpg.'),
+      jpeg(paste0(dirOut, 'slxLength.jpg'),
            width=480*1.5, height=480, pointsize=12*1.5)
       
         get_slxPlot(ages = fage:page, type = 'length', 
@@ -220,7 +220,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
   
         if(plotTrajBox){
           # First do a general boxplot of the trajectory over years
-          jpeg(paste0(dirOut, 'Traj/', PMname, '/boxmp', mp, '.jpg.'),
+          jpeg(paste0(dirOut, 'Traj/', PMname, '/boxmp', mp, '.jpg'),
                width=480*1.75, height=480, pointsize=12*1.5)
             
             par(mar=c(4,4,1,1))
@@ -236,7 +236,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
           # Do (up to) 5 trajectories as examples
           for(r in repidx){
     
-            jpeg(paste0(dirOut, 'Traj/', PMname, '/mp', mp, 'rep', r, '.jpg.'),
+            jpeg(paste0(dirOut, 'Traj/', PMname, '/mp', mp, 'rep', r, '.jpg'),
                  width=480*1.75, height=480, pointsize=12*1.5)
             
               get_tplot(x=tempPMmp[r,], yrs = yrs[pyidx], 
@@ -266,7 +266,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
         }
         
         # Make the plot
-        jpeg(paste0(dirOut, 'Traj/', PMname, '/MPMeanTraj.jpg.'),
+        jpeg(file.path(dirOut, "Traj", PMname, paste0(stockName,"_MPMeanTraj.jpg")),
              width=480*1.75, height=480, pointsize=12*1.5)
           par(mar=c(4,4,1,1))
           
@@ -281,7 +281,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
         dev.off()
        # if(nrow(mpMean)== 1 & runClass == 'HPCC' & nm[i]=='SSB'|nrow(mpMean)== 1 & runClass == 'HPCC' & nm[i]=='R'|nrow(mpMean)== 1 & runClass == 'HPCC' & nm[i]=='F_full'){
         
-      #  jpeg(paste0(dirOut, 'Traj/', PMname, '/MPMeanTrajwithEst.jpg.'),
+      #  jpeg(paste0(dirOut, 'Traj/', PMname, '/MPMeanTrajwithEst.jpg'),
       #       width=480*1.75, height=480, pointsize=12*1.5)
       #  par(mar=c(4,4,1,1))
       #  get_mpMeanTrajwithEst(mpMeanMat = mpMean, x=yrs[pyidx], nm=nm, 

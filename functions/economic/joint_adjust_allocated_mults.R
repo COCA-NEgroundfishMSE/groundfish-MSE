@@ -9,50 +9,58 @@
 
 ##############################################################################
 # Multi: For the "Multi" econ model, set the landings multipliers=0 for all spstock2 that have stockarea_open==FALSE
-# This closely mimics how multispecies currently works.  In theory, the landings multipliers for these closed groundfish might be unchanged for some species. But, for the most part, in order to land regulated groundfish, you'll have to be in the catch share program. 
-# We also set the catch multipliers to zero.  We assuming that vessels would declare out of groundfish and into something else if parts of the multispecies fishery were closed.  While they may encounter groundfish, this catch would not count against their ACE.
-##############################################################################
+# Multi models use stockarea_open as the condition 
+# Single models use the underACL columns as the conditon.
 
-##############################################################################
-# SingleA :  This is a single-species management scenario.   
-# sets the landings multipliers=0 for all spstock2 that have underACL==FALSE
-#There are no changes to the catch multipliers for these species.  However, since vessels can't land the targeted groundfish from these stockareas, they shouldn't end up targeting.  If they did take a trip in that stockarea, they'd have to discard.
-##############################################################################
+#CatchZero=TRUE indictes that the catch multipliers should be set to zero; 
+#CatchZero=FALSE indictes that the catch multipliers should be taken from the data; 
 
-##############################################################################
-# SingleB: This is a single-species management scenario.   
-# Sets the landings multipliers=0 and catch_multipliers=0 for all spstock2 that have underACL==FALSE
-# This is a single-species management scenario , that assumes perfect "untargeting." If they did take a trip in that stockarea, it would not encounter any of the closed groundfish. 
-##############################################################################
+#LandZero=TRUE indictes that the landings multipliers should be set to zero; 
+#LandZero=FALSE indictes that the landings multipliers should be taken from the data; 
+
+# CatchZero=TRUE implies LandZero=TRUE 
 
 joint_adjust_allocated_mults <- function(wt,fh, ec_type){
     mul_alloc<-fh[mults_allocated==1]
     closeds<-NULL
-    if (ec_type$EconType=="Multi" & ec_type$CatchZero=="FALSE"){
-      # For the "Multi" econ model, set the landings multipliers=0 for all spstock2 that have stockarea_open==FALSE
-      # Multi above.     
-      
+    
+    #For Multi-type models, look at the stockare_open column. For single type models, look at the underacl column
+    
+    if (ec_type$EconType=="Multi"){
       closeds<-mul_alloc[stockarea_open==FALSE]$spstock2
+    }else if (ec_type$EconType=="Single"){
+      closeds<-mul_alloc[underACL==FALSE]$spstock2
+    }
+    
+    #For CatchZero=FALSE and LandZero=TRUE, set the landings multipliers to zero
+    #For CatchZero=TRUE and LandZero=TRUE, set the catch and landings multipliers to zero
+    #For CatchZero=FALSE and LandZero=FALSE, leave the multipliers alone. 
+    
+    
+    if(ec_type$CatchZero=="FALSE"  & ec_type$LandZero=="TRUE"){
       closed<-paste0("l_", closeds)
-    } else if  (ec_type$EconType=="Multi" & ec_type$CatchZero=="TRUE"){
-      # This if statement sets the landings multipliers=0 for all spstock2 that have underACL==FALSE
-      closeds<-mul_alloc[underACL==FALSE]$spstock2
+    } else if  (ec_type$CatchZero=="TRUE" & ec_type$LandZero=="TRUE"){
       closed<-c(paste0("l_", closeds), paste0("c_",closeds))
-    }else if (ec_type$EconType=="Single" & ec_type$CatchZero=="FALSE"){
-      # This if statement sets the landings multipliers=0 for all spstock2 that have underACL==FALSE
-      closeds<-mul_alloc[underACL==FALSE]$spstock2
-      closed<-paste0("l_", closeds)
-    } else if (ec_type$EconType=="Single" & ec_type$CatchZero=="TRUE"){
-      # This if statement sets the landings multipliers=0 and catch_multipliers=0 for all spstock2 that have underACL==FALSE
-      closeds<-mul_alloc[underACL==FALSE]$spstock2
-      closed<-c(paste0("l_", closeds), paste0("c_",closeds))
-    } 
+    } else if  (ec_type$CatchZero=="FALSE" & ec_type$LandZero=="FALSE"){
+      #This has not been tested in combination with the wt[,(closed):=0] line
+      #closed<-NULL
+    } else if  (ec_type$CatchZero=="TRUE" & ec_type$LandZero=="FALSE"){
+      stop("Imposssible combination of Catch and Landings Multipliers. Check input parameters mproc.")
+    }
     
     if (length(closeds)==0){
       #do nothing
     } else {
+    # Set c_ and/or l_ mults to zero. 
+      
         wt[, (closed):=0]
+    # do not set harvest_sim=0 by just doing 
+      # wt[, (harvest_sim):=0]
+    # wt[spstock2 %in% closeds, harvest_sim :=0]
     }
+    
+
+    
     return(wt)
 }
 

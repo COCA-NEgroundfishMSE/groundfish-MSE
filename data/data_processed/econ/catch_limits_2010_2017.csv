@@ -1,9 +1,9 @@
 spstock2,totalACL_mt,nonsector_nonrec_fraction,rec_fraction,sector_frac,mults_allocated,mults_nonalloc,non_mult,stockarea
-americanlobster,,0,0,1,0,0,0,Unit
+americanlobster,,0,0,1,0,0,1,Unit
 americanplaiceflounder,16646,.0293,0,.9707,1,0,0,Unit
-codGB,20048,.0847,0,.9153,1,0,0,GB
+codGB,21646,.1848,0,.8152,1,0,0,GB
 codGOM,27585,.0477,.337,.6153,1,0,0,GOM
-haddockGB,281968,.0138,0,.9862,1,0,0,GB
+haddockGB,405688,.2326,0,.7674,1,0,0,GB
 haddockGOM,13301,.0249,.275,.7001,1,0,0,GOM
 halibut,765,.3027,0,.6973,0,1,0,Unit
 monkfish,,0,0,1,0,0,1,Unit
@@ -27,5 +27,5 @@ winterflounderSNEMA,8379,.2389,0,.7611,1,0,0,SNEMA
 witchflounder,7299,.1465,0,.8535,1,0,0,Unit
 wolffish,580,.019,0,.981,0,1,0,Unit
 yellowtailflounderCCGOM,5306,.1339,0,.8661,1,0,0,CCGOM
-yellowtailflounderGB,4213.4,.1328,0,.8672,1,0,0,GB
+yellowtailflounderGB,7388.4,.1406,0,.8594,1,0,0,GB
 yellowtailflounderSNEMA,4555,.2318,0,.7682,1,0,0,SNEMA

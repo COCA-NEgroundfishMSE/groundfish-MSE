@@ -32,10 +32,10 @@ droppval<-function(working_coefs){
   working_coefs
 }
 
- 
+for (coef in 1:length(models)){
 
 # This is code to pull out ASC logit coefficients for trawl
-asc_coefs <- read.csv(file.path(rawpath,trawl_targeting_coef_source), sep="\t", header=TRUE,stringsAsFactors=FALSE)
+asc_coefs <- read.csv(file.path(rawpath,trawl_targeting_coef_source[coef]), sep="\t", header=TRUE,stringsAsFactors=FALSE)
 asc_coefs<-asc_coefs[,-3]
 
 #Separate on the ":" and tidy up white space a bit
@@ -48,7 +48,7 @@ asc_coefs$gearcat<-"TRAWL"
 
 
 #Repeat for gillnet and then stack together.
-gn_coefs <- read.csv(file.path(rawpath,gillnet_targeting_coef_source), sep="\t", header=TRUE,stringsAsFactors=FALSE)
+gn_coefs <- read.csv(file.path(rawpath,gillnet_targeting_coef_source[coef]), sep="\t", header=TRUE,stringsAsFactors=FALSE)
 gn_coefs<-gn_coefs[,-3]
 
 
@@ -59,13 +59,14 @@ gn_coefs$equation<-trimws(gn_coefs$equation, which=c("both"))
 gn_coefs$variable<-gsub(",","", gn_coefs$variable)
 gn_coefs$variable<-trimws(gn_coefs$variable, which=c("both"))
 gn_coefs$gearcat<-"GILLNETS"
+# for some reason, partial_closure is coming in as o.partial_closure for gillnets 
+gn_coefs$variable[gn_coefs$variable=="o.partial_closure"] <-"partial_closure"
+
 
 asc_coefs<-rbind(asc_coefs,gn_coefs)
 asc_coefs$variable[asc_coefs$variable=="_cons"] <-"constant"
 
 rm(gn_coefs)
-
-
 
 # Split asc_coefs into two dataframes. One where equation=="spstock2" and the other where equation~="spstock2" 
 asc_coefs$variable<-paste0("beta_",asc_coefs$variable)
@@ -80,6 +81,7 @@ all_coefs<-spread(all_coefs,variable,coefficient)
 asc_coefs2<-asc_coefs[which(asc_coefs$equation!="spstock2"),]
 colnames(asc_coefs2)[1]<-"spstock2"
 
+#create the "nofish" observations by duplicating the CodGOM, setting all coeffs to zero, and rbinding.
 extra<-asc_coefs2[which(asc_coefs2$spstock2=="CodGOM"),]
 extra$coefficient<-0 
 extra$spstock2<-"nofish" 
@@ -92,15 +94,15 @@ asc_coefs2<-spread(asc_coefs2,variable,coefficient)
 targeting_coefs<-inner_join(asc_coefs2,all_coefs, by="gearcat")
 
 
-#The "start of season" variable goes in slightly differently for gillnet and trawl
+#The "start of season" variable used to go slightly differently for gillnet and trawl
+#targeting_coefs$beta_start_of_season.x[is.na(targeting_coefs$beta_start_of_season.x)] <- targeting_coefs$beta_start_of_season.y[is.na(targeting_coefs$beta_start_of_season.x)]
+#targeting_coefs<-within(targeting_coefs, rm(beta_start_of_season.y))
 
 
 
-targeting_coefs$beta_start_of_season.x[is.na(targeting_coefs$beta_start_of_season.x)] <- targeting_coefs$beta_start_of_season.y[is.na(targeting_coefs$beta_start_of_season.x)]
-targeting_coefs<-within(targeting_coefs, rm(beta_start_of_season.y))
 
-colnames(targeting_coefs)[colnames(targeting_coefs)=="beta_start_of_season.x"] <- "beta_start_of_season"
-colnames(targeting_coefs)[colnames(targeting_coefs)=="beta_exp_rev_total_das"] <- "beta_exp_rev_total"
+#colnames(targeting_coefs)[colnames(targeting_coefs)=="beta_start_of_season.x"] <- "beta_start_of_season"
+#colnames(targeting_coefs)[colnames(targeting_coefs)=="beta_exp_rev_total_das"] <- "beta_exp_rev_total"
 
 #Force NAs to zero. This is legit. I promise.
 targeting_coefs[is.na(targeting_coefs)]<-0
@@ -123,7 +125,7 @@ targeting_coefs$spstock2<- gsub("gom","GOM",targeting_coefs$spstock2)
 targeting_coefs$spstock2<- gsub("snema","SNEMA",targeting_coefs$spstock2)
 
 
-saveRDS(targeting_coefs, file=file.path(savepath, target_coef_outfile), compress=FALSE)
+saveRDS(targeting_coefs, file=file.path(savepath, target_coef_outfile[coef]), compress=FALSE)
 rm(list=c("all_coefs","asc_coefs","asc_coefs2","extra"))
-
+}
 

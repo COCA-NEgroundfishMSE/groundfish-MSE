@@ -4,7 +4,7 @@
 # Determine what platform the code is running on (Duplicated purposefully
 # in runPre.R for running on HPCC)
 platform <- Sys.info()['sysname']
-
+servername <- Sys.info()['nodename']
 # Determine whether or not this is a run on the HPCC by checking the name of
 # the node
 if(platform == 'Linux'){
@@ -16,8 +16,12 @@ if(platform == 'Linux'){
   # error.
   if(length(evndir) > 0 && evndir == '/lsf/conf'){
     runClass <- 'HPCC'
-  }else{
-    runClass <- 'Local'
+  }else if(servername=='neptune'){
+    runClass<-'neptune'
+  }else if(servername=='mlee-linux-pc'){
+    runClass<-'mleeLocal'
+  }else if(Sys.info()['effective_user']=='mlee'){
+    runClass<-'mleeContainer'
   }
 }else{
   runClass <- 'Local'

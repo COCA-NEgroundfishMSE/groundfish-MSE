@@ -65,7 +65,8 @@ local imports: dir "." files "econ_`date'*.csv"
 		qui save `new', emptyok
 	}
 }
-dsconcat `filesstore'
+clear
+append using `filesstore'
 
 gen caldate=mdy(5,1,y)+doffy-1
 

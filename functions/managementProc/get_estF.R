@@ -6,7 +6,7 @@ get_estF<-function(catchproj,parmgtproj,parpopproj,parenv,Rfun,stockEnv){
     init <- tail(parpopproj$J1N, 1)
     
     #Rho-adjustments to SSB if this option is turned on 
-    if (mproc$rhoadjust==TRUE & y>fmyearIdx & stockEnv$Mohns_Rho_SSB[y]>0.15){
+    if (mproc$rhoadjust[m]==TRUE & y>fmyearIdx & stockEnv$Mohns_Rho_SSB[y]>0.15){
       init<-init/(1+stockEnv$Mohns_Rho_SSB[y])
     }
     N[1,] <- init 

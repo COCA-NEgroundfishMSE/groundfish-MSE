@@ -1,315 +1,86 @@
 ---
-title: 'Implementation Error'
-author:  Lee, Birkenbach, Truesdell, Cummings(t), Kerr,
-csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl
+title: "Implementation Error"
+author: Min-Yang Lee , Anna Birkenbach, Truesdell, Cummings, Kerr, TBD
+abstract: |
+ To be reasonably accurate, a multispecies simulation model must account for techincal interactions. We do that for the northeast US groundfish fishery.  This allows for fishing mortality to be systematically different from the level set by fishery managers.
+keywords:
+  - Management Strategy Evaulation 
+  - Integrated Bioeconomic Models 
+  - Fisheries
+link-citations: yes
+header-includes:
+- \usepackage{graphicx}
+- \usepackage{float}
+- \usepackage{pdflscape}
+- \usepackage{setspace}
+- \newcommand{\blandscape}{\begin{landscape}}
+- \newcommand{\elandscape}{\end{landscape}}
+- \onehalfspacing
+output: 
+  bookdown::pdf_book:
+    keep_tex: yes
+    toc: False
+    fig_caption: yes
+bibliography: library.bib
+---
+
+<!---Don't read, or touch this part
+
+author:  Lee, Birkenbach, 
 output:
   pdf_document:
-    includes:
-      in_header: preamble-latex.tex
+     base_format: rticles::oup_article
+csl: canadian-journal-of-fisheries-and-aquatic-sciences.csl 
     keep_tex: yes
-    pandoc_args: --pdf-engine=xelatex
   html_document: null
   word_document: null
-bibliography: minyang_bib.bib
+ 
 ---
-<!---Don't read, or touch this part -->
 
 
+  -->
+  
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, fig.align='center')
-if(!require(ggplot2)) {  
-  install.packages("ggplot2")
-  require(ggplot2)}
-if(!require(tidyr)) {  
-  install.packages("tidyr")
-  require(tidyr)}
-if(!require(dplyr)) {  
-  install.packages("dplyr")
-  require(dplyr)}
-if(!require(broom)) {  
-  install.packages("broom")
-  require(broom)}
-if(!require(knitr)) {  
-  install.packages("knitr")
-  require(knitr)}
-if(!require(gridExtra)) {  
-  install.packages("gridExtra")
-  require(gridExtra)}
-if(!require(grid)) {  
-  install.packages("grid")
-  require(grid)}
-if(!require(ggthemes)) {  
-  install.packages("ggthemes")
-  require(ggthemes)}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(kableExtra)
+library(tikzDevice)
+#library(devtools)
+#devtools::install_github("adletaw/captioner")
+library(captioner)
+here::i_am("documentation/economics/econ_documentation.Rmd")
+library(here)
+fig_nums <- captioner(prefix= "Figure")
 
 
-#to get table captions and numbering
-tn = local({
-  i = 0
-  function(x) {
-    i <<- i + 1
-    #paste('\n\n:Table ', i, ': ', x, sep = '')
-    paste('\n\n:', x, sep = '')
-    # The : before Table tells pandoc to wrap your caption in <caption></caption>
-  }
-})
-knit_hooks$set(tab.cap = function(before, options, envir) {
-  if(!before)
-    tn(options$tab.cap)
-})
-default_output_hook = knit_hooks$get("output")
-knit_hooks$set(output = function(x, options) {
-  if (is.null(options$tab.cap) == F)  
-    x
-  else
-    default_output_hook(x,options)
-})
-
-#a better plotting theme than ggplot default? from https://rpubs.com/Koundy/71792
-theme_Publication <- function(base_size=14, base_family="") {
-      library(grid)
-      library(ggthemes)
-      (theme_foundation(base_size=base_size, base_family=base_family)
-       + theme(plot.title = element_text(face = "bold",
-                                         size = rel(1.2), hjust = 0.5),
-               text = element_text(),
-               panel.background = element_rect(colour = NA),
-               plot.background = element_rect(colour = NA),
-               panel.border = element_rect(colour = NA),
-               axis.title = element_text(face = "bold",size = rel(1)),
-               axis.title.y = element_text(angle=90,vjust =2),
-               axis.title.x = element_text(vjust = -0.2),
-               axis.text = element_text(), 
-               axis.line = element_line(colour="black"),
-               axis.ticks = element_line(),
-               panel.grid.major = element_line(colour="#f0f0f0"),
-               panel.grid.minor = element_blank(),
-               legend.key = element_rect(colour = NA),
-               legend.position = "right",
-               legend.direction = "vertical",
-               legend.key.size= unit(0.4, "cm"),
-               legend.margin = unit(0, "cm"),
-               legend.title = element_text(face="italic"),
-               plot.margin=unit(c(10,5,5,5),"mm"),
-               strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"),
-               strip.text = element_text(face="bold")
-          ))
-      
-}
-
-scale_fill_Publication <- function(...){
-      library(scales)
-      discrete_scale("fill","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
-
-}
-
-scale_colour_Publication <- function(...){
-      library(scales)
-      discrete_scale("colour","Publication",manual_pal(values = c("#386cb0","#fdb462","#7fc97f","#ef3b2c","#662506","#a6cee3","#fb9a99","#984ea3","#ffff33")), ...)
-
-}
 ```
 <!---End of the don't read, or touch this part -->
-
-\doublespacing
-
-<!---Oh god this is such a hack -->
-M. Lee: NOAA Fisheries, Northeast Fisheries Science Center. 166 Water St. Woods Hole MA. 02543.  Min-Yang.Lee@noaa.gov. tel: (508) 495-4704 Fax: (508) 548-2649
-
-A. Birkenbach: University of Delaware, College of Earth, Ocean, and Environment Street, 207 Robinson Hall, Newark , DE 19716. abirken@udel.edu 
-
-S. Truesdell:
-
-J. Cummins: 
-
-L. Kerr: 
 
 Funding acknowledgements:
 
 Intended Outlet: ICES-JMS, CJFAS, Frontiers in Marine Science
 
 \newpage
-
-# Executive Summary 
-
-## Research Questions:
-1. When do single-species fishery models applied to a multispecies fishery give different results than a multispecies fishery model applied to a multispecies fishery?  
-2. What happens when we join a structural (mechanistic) economic model to a stock dynamics model?
-
-## Motivation:
-We almost always do single-species bioeconomic models.  Most of the bioeconomic models out there are non-mechanistic (either metier based or even more aggregated than that).
-
-## Ideal methods:
-Ideally, we would compare the results of single- and multi-species simulation models to some holdout data and examine which fits better[^method1].  This is not compelling for two reasons:
-
-1. It’s really tricky to figure out the implementation error based on the 2004-2009 time period (no ACLs or even target TACS for some stocks). It’s not clear that the implementation errors from 2004-2009 can reasonably pooled with 2010-2018 data from the catch share system. 
-2.  We could use 2010-2018 data to parameterize the distribution of the implementation error, but that's just 9 data points - this might be very difficult.
-
-[^method1]: We’re doing something this for the Economics focused paper -- we estimate a behavioral model under Days-at-Sea managment (2004-2009) and then validate the parameters by simulating the 2010-2015 period, with certain adjustments. 
-
-## Actual Methods:  
-We construct stock dynamics models for three stocks of fish on Georges Bank that are managed together.  We couple those models with an individual-based model of fishing grounded in economic principles.  We apply an HCR to get target *F*s and catch limits for the modeled stocks.  
-
-We then conduct four sets of “matched” simulations for a moderate number of years (say 15-30):
-
-Simulation 1B - Multispecies bioeconomic:  If the aggregate quotas are reached for a stock, fishing for all regulated groundfish by vessels in the groundfish fishery in that area ceases.  Vessels that want to fish in that area could "declare out" of groundfish, but they cannot land groundfish and their catch does not count against the groundfish catch limits.  This scenario closely mimics the current catch share system for multispecies.  
-Simulation 2B -“single-species” bioeconomic -- if the aggregate quota is reached for a stock, fishing for only that stock stops.  Perfect avoidance (fishermen somehow avoid all of the closed stock).  
-
-
-\iffalse
-\begin{align}
-F_{real}& = F_{advice}*\varepsilon\\
-\varepsilon &= \frac{F_{real}}{F_{advice}}
-\end{align}
-  \fi
-For both of these simulations, we can compute realized $F$ and therefore the implementation error in any year. We characterize the distribution of "implementation error" for our stocks (that is assumed to be i.i.d, probably a log-normal or half normal). We will either fit a distribution or draw directly out of those error terms.  We then simulate the "traditional" fisheries model with random implementation error implied by those distributions[^method2].  This mimics an MSE-implementation error approach.  
-
-Simulation 1T Multispecies traditional: apply a traditional fisheries model where the implementation errors come from the Simulation 1B.
-
-Simulation 2T Singlespecies traditional: apply a traditional fisheries model where the implementation errors come from the Simulation 2B.
-
-Compare "outputs" from 1B and 1T, 2B and 2T.  My working hypothesis is that some interesting metrics will be different between 1B and 1T.  And that most metrics will the same for 2B and 2T.  
-
-[^method2]: In the multispecies catch-share management model, the implementation error terms for species i are likely to be autocorrelated.  And they are likely to be (inversely) correlated with the error terms for species j. This procedure rules out both of those correlations.
-
-##  Intuition
-Models 1B and 2B are models of how we think the fishery operates. Generating a distribution of implementation errors and then constructing a single-species model is similar to the way MSE's are done.  
-
-
-## Output metrics
-Our metrics will have to be “fleet level” revenue from the “modeled” species?  Also biomass trajectories and overfished/overfishing.  The “partial” results (say revenue from haddockGB+codGB+winterGB) may be very misleading compared to “total revenue”.  We probably want to do just a relatively short term scenario and initialize the simulation from approximately 2010 levels.
-
-We will evaluate the sensitivity of our results to:
-
-  #. HCRs?
-  #. Output prices? (prefer not to)
-  #. Prefer not to evaluate with respect to climate change things or life history parameters?
-
-
+```{r child = here("documentation","economics","sections","Executive_Summary.Rmd")}
+```
 \newpage
 Intentionally Blank.
 \newpage
 
-# Abstract
-
-To be reasonably accurate, a multispecies simulation model must account for techincal interactions. We do that for the northeast US groundfish fishery.  This allows for fishing mortality to be systematically different from the level set by fishery managers.
-
 # Introduction
-
-Many of the complex simulation models used to inform fisheries managers take a phenomenological (reduced-form) approach [@Fenichel2013] to the process by which humans kill fish.  For example, @Kritzer2019 and @Sun2019 assume the fishing mortality rate (F) is set directly by managers.  @punt2008evaluation, @Deroba2012Evaluating, and @Deroba2019  assume that the actual fishing mortality rate is equal to the fishing mortality rate, set by the manager, but modified by an idiosycratic error term.  The distribution of this error term is approximated from historical data[^ierror].  This relatively abstract representation of fishing fleets allow for intense focus on biological and ecosystem complexities.  @Fulton2011a note that implementation error encompasses three distinct processes: (1) decisions where scientific advice on stock status is subordinated; (2) lack of direct regulatory control of fishing mortality due to inadequate enforcement or a lack of a direct link between controls (regulations) and harvest; and (3) unexpected behavioural responses of resource users.  
-
-[^ierror]: We'll need more examples of the implementation error approach, and how it is parameterized.
-
-We aim to address the second and third of these processes (not the first) in the context of the Northeast United States multispecies fishery, commonly referred to as groundfish. Participants in this fishery target a collection of demersal fish in the Northwest Atlantic Ocean.  Production is joint.  We pair a mechanistic (structural) model of production in a multispecies fishery with stock dynamics and assessment models. Our general approach is similar to that of @Ono2018.  We focus on one specific way that technical interactions (or jointness in production) matter: the bycatch or "choke stock" story[^choke]  in multispecies fishery. [^diffs] We apply the model to the northeast US multispecies fishery, commonly referred to as groundfish.  Participants in this fishery have been observed to change their  behavior in response to recent policy changes: @Scheld2018 and @Holzer2019 document changes in fishing behavior after changes in management.
-
-[^choke]: we are not actually going to call this the "choke stock" story.
-
-[^diffs]: We're doing something pretty different from @Ono2018.  Structural model instead of metier model. No "expansion factor" hacks for behavioral changes.  Fish stock model is fine.  
-
-When subsets of fishing vessels can be assumed homogeneous, the metier based approach [cf:@Merzereaud2011;@Guillen2014; @Ono2018] can be applied.  The downside is ZZZZ.  Metier based approaches often classify, in part, on outcome variables (catch composition, gear-area fished, etc.)
-
-@Nielsen2018 review thirty-five integrated ecological-economic fisheries models: three (DISPLACE, IAM, and ELFSIM)  include models of individual fishing vessels, the rest use a metier or larger aggregation.  
-
-DISPLACE includes a phenomenological model of vessel behavior at a very fine spatial and temporal scale [@Bastardie2010a]. @Bastardie2016 is an update.
-
-> We demonstrate that integrating the spatial activity ofvessels and fish abundance dynamics allow for more realistic predictions of fishermen behaviour, profits, and stock abundance.
-
-Basic ELFSIM -- The (base) model is at the metier, but this has been updated with a quota market model [@Little2007; @Little2009].  Two species, vessels assumed will stop fishing if it runs out of coral trout quota. 
-
-IAM is listed as individual based, but that does not appear to be the case in Nephrops, Main documentation (@Merzereaud2011), or biscay sole @Guillen2013a.    @Bellanger2017 contains a large IAM improvement; however, there are no "choke stocks", which is very reasonable based on historical outcomes as long as the evaluated policies are "local."  <!-- Given @Belanger2017, and the quota market model in @Little2009, we'll have to thread the needle carefully with pitching the improvement of paper -->.
-
-@Weninger2019 describes some shortcomings from EwE, Atlantis, FishRent, FCube, Temas, and DISPLACE as:
-
-> In sum, two key commonalities arise in fishery sector models: (1) restrictive assumptions for the structure of the multiple-species harvest technology in the form of fixed output proportions and (2) use of user-specified and ad hoc rules to characterize fishing behavior which are commonly estimated by naive prediction, i.e., next period behavior will be equal to last period behavior. I next argue that robust prediction of commercial fishing outcomes in complex and decentralized fishery environments requires less restrictive assumptions for multiple-species harvesting technologies and adoption of rational decision rules that are consistent with regulatory instruments used to manage real world fisheries
-
-@Ono2018 states:
-
->Some MSE frameworks include some elements of fleet dynamics (e.g., Atlantis (Fulton et al. 2011), BIOMAS (Ives et al. 2013), FLR (Kell et al. 2007), and ISIS-FISH (Pelletier et al. 2009)), but a multi- species fishery quota allocation model with trade-offs and con- straints (i.e., based on constrained optimization) as well as the temporal dynamics of technical interactions has never been included in an MSE.
-
-Single species models, with or without random implementation error, cannot credibly model interrelated fisheries with technical interactions. 
-
-We realistically allow for leakages out of the main fishery into other fisheries [@Cunningham2016].  Because our model is grounded in a structural model of individuals's utility maximization, instead of a reduced form model of metiers, we are better able to predict changes in behavior that result from changes in policies.  <!--For example, we can examine policies that include tradable output controls (ITQs), non-tradable output controls (IFQs), and certain input controls (Days-at-Sea).  We also do some other cool stuff.-->
-
-Even without an ecological linkage (predator-prey or competition), a single species model of $F$ with implementation error lead to very different recommendations compared to a multispecies simulation model.
-
-
-
-<!---
-The implementation error approach is quite common.
-
-This is a common approach(Irwin et al 2008). 
-(Rosenberg and Brault 1993 Rosenberg, A.A. and Brault, S. (1993) Choosing a man-
-agement strategy for stock rebuilding when control is
-uncertain. Canadian Special Publication of Fisheries and
-Aquatic Sciences 120, 243–253.
-
-O’Boyle 1993  O’Boyle, R. (1993) Fisheries management organizations: a
-study in uncertainty. Canadian Special Publication of
-Fisheries and Aquatic Sciences 120, 423–436.
-
-FAO 1996  FAO (1996) Precautionary approach to fisheries Part 2:
-scientific papers prepared for the technical consultation
-on the precautionary approach to capture fisheries
-(including species introductions) Lysekil, Sweden, 6–13
-June 1995. FAO Fish Tech Paper 350(Part 2). FAO,
-Rome. p. 210.
-
- Francis and Shotton rancis, R.I.C.C. and Shotton, R. (1997) ‘‘Risk’’ in fisheries
-management: a review. Canadian Journal of Fisheries and
-Aquatic Sciences 54, 1699–1715.
-
-Dichemont 2006abc papers.
- -->
-
-## Related Literature
-<!---We're not actually going to have a related literature section -->
-Construction of complex simulation models with many sources of uncertainty is standard in the fisheries literature [c.f. @Smith1999; @Punt2016].  Our model is similar to that of @Ono2018, which models three principal groundfish stocks (Pacific Cod, Alaska Pollock, and Yellowfin Sole) and one bycatch species (Pacific Halibut).  Fishing vessels are assigned to metiers and assigned a baseline catch level based on historical data.  The fishery manager *selects* total allowable catch for each metier-species combination. SSB will scale the baseline catch. It's unclear how/why the fishery stops fishing. But it's also quasi-behavioral, there's an "adjustment" to the scaling that accounts for adaptation.
-
-Here is a partial list of single-species or independent models applied to  a fishery with techincal interactions (joint).
-
-@Forrest2018 examines Hecate Strait Pacific Cod and Rock Sole.  The Rock sole stock assessment notes:
-
-> Substantial reductions in the Pacific Cod (Gadus macrocephalus) TAC, starting with the 2000/2001 fishing season, likely affected Rock Sole catch patterns, as Rock Sole are often caught concurrently with Pacific Cod.  In Area 5CD, the reduction in Pacific Cod TAC was from 1000 tonnes to 200 tonnes within a single year (2000/2001).  Pacific Cod TACs have risen in recent years and are now at 1,200 tonnes in Area 5CDE and 590 tonnes in Area 5AB
-
-@Sun2019 examines Gulf of Maine Atlantic Cod.  These are caught with other groundfish [@Squires1987;@Scheld2018] 
-
-@Needle2008 examines North Sea haddock. These are also caught with other groundfish.
-@Amar2009 and @Ianelli2011 examine Gulf of Alaska Walleye Pollock. These are also caught with other groundfish [@Ono2018].
-
-@Prellozo2016 examine the multispecies fishery in the Bay of Biscay.  A metier-stock approach is taken: each metier has it's own catchability coefficient estimated from Increasing Returns to Scale production fucntion 
-$$
-h=qE^\alpha X^\beta
-$$
-where $\alpha=\beta=1$. @Prellozo2016 builds upon @Ulrich2011's FCUBE, which in turn, builds up on @Kell2007's FLR.
-
-@Thorpe2017a; @Thorpe2019; @Thorpe2019a examines a multispecies fishery using a metier based approach.
-
-# Background 
-We're going to need stylized facts about the groundfish fishery
-
+```{r child = here("documentation","economics","sections","Introduction.Rmd")}
+```
 # Methods
-Here is the methods section
-
-## A structural economic model of targeting 
-
-## A model of the fishery 
-
-## A model of stock dynamics
-
-## Performance Metrics
-
-### Economic Performance Metrics
+```{r child = here("documentation","economics","sections","Methods.Rmd")}
+```
 
 # Results
-Here is an overview of our results.
-
+```{r child = here("documentation","economics","sections","Results.Rmd")}
+```
 
 # Discussion
-Here is the discussion of our results
-
-
-
-
+```{r child = here("documentation","economics","sections","Discussion.Rmd")}
+```
 
 # Acknowledgements
 

@@ -140,39 +140,101 @@ This determines if a catch variation limit is applied to the catch advice. If se
 The following are only relevant if *ImplementationClass*=='Economic.'
 
 ## EconName
-A short name for the scenario.  This column is not used by any of the simulation code.  It is mostly as a convenience.
+A short name for the scenario.  This column is not used by any of the simulation code.  It is mostly as a convenience but is also somewhat duplicative with the EconData column and probably should be removed.
 
 ## EconType
-The broad type of fisheres management.  This column is only used in the "joint_adjust_allocated_mults.R" function.  
-   Multi: a closure in a stockarea closes everything in that stockarea (no landings of GB Cod if GB haddock is closed).  This resembles how the catch share fisheries is managed.
-   Single: a closure in a stockarea does not close everything in that stockarea ( landings of GB Cod allowed if GB haddock is closed)  This does not really resemble how the catch share fishery is managed.
+The broad type of fisheres management.  This column is only used in the ``joint_adjust_allocated_mults.R`` function.  The two values allowed here are "Multi" and "Single."
+
+* **Multi**: a closure in a stockarea closes all groundfish in that stockarea (no landings of GB Cod if GB haddock is closed).  This resembles how the catch share fisheries is managed.
+* **Single**: a closure in a stockarea does *not* close everything in that stockarea (landings of GB Cod allowed if GB haddock is closed).  This does not really resemble how the catch share fishery is managed.
    
 ## CatchZero
-Governs catch if a stock is closed. This column is only used in the "joint_adjust_allocated_mults.R" function.
-  TRUE: no catch of GB Cod if GB cod is closed.  This implies perfect targeting/avoidance.
-  FALSE catch of GB Cod occurs when GB cod is closed.  All catch would be discarded.  This implies no change in joint targeting behavior occurs if a stock is closed.
-The truth is somewhere in between.  
+Governs catch if a stock is closed. This column is only used in the ``joint_adjust_allocated_mults.R`` function.
+
+* **TRUE**: no catch of GB Cod if GB cod is closed.  This implies perfect targeting/avoidance.
+* **FALSE**: catch of GB Cod occurs when GB cod is closed.  All catch would be discarded.  This implies no change in joint targeting behavior occurs if a stock is closed.
+
+True behavior is somewhere in between these two extremes.  
   
 ## EconData
-  A stub that determines which base economic dataset to use (see data processing steps).   This column is used to load data in /processes/loadEcon2.R 
+  A stub that determines which base economic dataset to use (see data processing steps).   This column determines the type of data loaded in ``/processes/loadEcon2.R.`` There are three "words" in this column, separated by an underscore. The first word describes the type of data.
+
+* **validation**: This is data that set up to assess how well the economic model performs.  The econometric model is estimated on pre catch-share data.  The independent variables are set to their actual values in the post catch-share time period.  If the econometric model is good, then using pre catch-share data to predict post catch share behavior will work well.
+
+* **counterfactual**: This is data that set up to assess how different the fishery would have been if there were no catch shares.  The econometric model is estimated on pre catch-share data.  The independent variables are adjusted to reasonable values corresponding to a days-at-sea fishery.  Differences between the counterfactual and the validation/actual are the due to the catch share policy. 
+
+* **MSE**: This is data set up to perform best in the future. The econometric model is estimated on post catch-share data. The independent variables are set to their actual values in the post catch-share time period.  
+
+The second word describes the time period used for the econometric model. It is a bit duplicative.
+
+* **pre**: Econometric model from 2004-2009.
+* **post**: Econometric model from 2010-2015.
+
+The third word describes the type of econometric model. We estimated models with and without constants.  We estimated models with two types of constructions for the opportunity costs of fishing.
+
+* **coefs1**: has alternative specific constants.  The price of a day-at-sea and an interaction between days-at-sea price  and vessel length enters the econometric model separately. The effects of these independent variables is allowed to vary across the different targeting choices.  
+* **coefsnc1**: No alternative specific constants.   The price of a day-at-sea and an interaction between days-at-sea price  and vessel length enters the econometric model separately. The effects of these independent variables is allowed to vary across the different targeting choices.  
+* **coefs2**:has alternative specific constants. The cost of a day at sea is subtracted from the expected revenues.  The price of a day at sea does not enter the estimating equation.
+* **coefsnc2**:No alternative specific constants.The cost of a day at sea is subtracted from the expected revenues.  The price of a day at sea does not enter the estimating equation.
+
+Model 2 fit the data as well as model 1 and is a bit more theoretically compelling.  The ``nc`` flavor is more general than the model with constants. So most simulations are the ``nc2`` flavor.  
 
 ## MultiplierFile
-  The full name of the multiplier file to use.  Must  include the .Rds extension.  This column is used to load data in /processes/setupEconType.R 
+  The full name of the multiplier file to use.  Must  include the .Rds extension.  This column is used to load data in ``/processes/setupEconType.R`` 
+
+* **MSE_post_multipliers.Rds** Multipliers set up for the MSE based on the post time period.
 
 ## OutputPriceFile 
-  The full name of the output price  file to use.  Must include the .Rds extension.  This column is used to load data in /processes/setupEconType.R 
-  
+  The full name of the output price  file to use.  Must include the .Rds extension.  This column is used to load data in ``/processes/setupEconType.R`` 
+
+* **MSE_post_output_prices.Rds** Output prices set up for the MSE based on the post time period.
+
 ## InputPriceFile 
-  The full name of the input price  file to use.  Must include the .Rds extension.  This column is used to load data in /processes/setupEconType.R 
+  The full name of the input price  file to use.  Must include the .Rds extension.  This column is used to load data in ``/processes/setupEconType.R`` 
+  
+* **MSE_post_input_prices.Rds** Input prices set up for the MSE based on the post time period.
   
 ## ProdEqn
-  Suffix for the production equation. The valid production equations are described in set_om_parameters_global.R.  Currently, the choices are just pre and post.  This column is used to declare the production equation in /processes/setupEconType.R 
+  Suffix for the production equation. The valid production equations are described in ``set_om_parameters_global.R``.  Currently, the choices are just ``pre`` and ``post``.  This column is used to declare the production equation in ``/processes/setupEconType.R`` 
   
 ## ChoiceEqn
-  Suffix for the choice equation. The valid choice equations are described in set_om_parameters_global.R. Currently, the choices are just pre and post.  But options for noconstant or something else could be set up. This column is used to declare the choice equation in /processes/setupEconType.R 
-
-This is also in the economic model documentation.
+  Suffix for the choice equation. The valid choice equations are described in ``set_om_parameters_global.R``. Currently, there are 4 "pre" models and 1 "post" model:  
 
 
+* **pre1**
+* **pre2** 
+* **prenc1**
+* **prenc2** 
+* **postnc2**
 
-[Return to Wiki Home](https://github.com/thefaylab/groundfish-MSE/wiki)
+The MSE will use the postnc2.  
+This column is used to declare the choice equation in ``/processes/setupEconType.R`` This is also in the economic model documentation.
+
+
+## econ_year_style
+This determines how we are passing in years of economic data
+1. A year (YYYY, like 2015 or 2013). Every MSE year will use economic data from a single year
+2. Randomly select a year  - each year of the MSE gets randomly matched with a year of economic data. This is done with replacement.
+3. Block Randomly select a year - each year of the MSE gets randomly matched with a year of economic data. Each replicate will have the same economic year.
+    # In Rep 1, if cal_year=2011 matches to econ_year=2012, then in Rep 2, cal_year=2011 will match to econ_year=2012.
+4. Align. We align the 2010 economic data to the 2010 year of the simulation. We align 2011 economic data to the 2011 year of the simulation.  Once we run out of years of economic data, we start over at 2010.    
+
+
+
+
+## ie_override
+ A True or False column determines whether we will  override the ``ie_F`` and ``ie_bias`` parameters in the  defined in ``/stock/stockname.R`` and stored in ``stock[[N]]ie_F``
+
+
+## ie_source
+
+If ie_override=TRUE, this determines where to find updated parameters. This can either 
+1.  "Internal" this reads in an internally estimated ie_F_hat and ie_bias_hat from a previously run model. 
+2.  "results_YYYY-MM-DD-HH-MM-SS"  This reads in results from the omvalGlobal file in that folder. 
+
+## ie_from_model
+if ie_source=Internal, this determines the model number to use for updated parameters.
+
+
+
+[Return to Wiki Home](https://github.com/lkerr/groundfish-MSE/wiki)

@@ -6,50 +6,91 @@
 # need to update this file with variable changes and equation changes. Anna is sending over a stata .ster. for coefficients
 
 
-target_coefs<-target_coef_outfile
-production_coefs<-production_outfile
-
-targeting_coefs<-readRDS(file.path(savepath,target_coefs))
-
-production_coefs<-readRDS(file.path(savepath, production_coefs))
-production_coefs[, post:=NULL]
-
-
-
 inputprices<-readRDS(file.path(savepath, input_working))
 multipliers<-readRDS(file.path(savepath, multiplier_working))
 outputprices<-readRDS(file.path(savepath, output_working))
 
 
+#For loop to create targetting data set for other models 
+for (coef in 1:length(models)) {
+  modelname<-models[coef]
+target_coefs<-target_coef_outfile[coef]
+targeting_coefs<-readRDS(file.path(savepath,target_coefs))
+
+
+
+
 #for the counterfactual, we do something else -- we need average multipliers by hullnum, MONTH, spstock2.
-
-
-
-
-
 for (wy in 2010:2015) {
     idx<-wy-2009
+  
     
-  yrsavefile<-paste0(yearly_savename,wy,".Rds")
+  yrsavefile<-paste0(yearly_savename[coef],wy,".Rds")
   targeting_source<-paste0(yrstub,"_",wy,".dta")
   
   targeting <- read.dta13(file.path(rawpath, targeting_source))
   
+  
+  # exp_rev_total variable switches based on model number
+  tchars<-nchar(modelname)
+  modelno<-substr(modelname,tchars,tchars)
+
+  if(modelno=="2"){
+    targeting$exp_rev_total<-targeting$exp_rev_total_das
+  } else if(modelno=="1"){
+      # do nothing, we will match exp_rev_total automatically
+  } else {
+    stop("Unrecognized model number ")
+  }
+
+  
+  # the validation or MSE only, change das_price_hat to das_price_mean
+  #I don't think we want to do this!  In the post as post, we should have DAS costs=0
+  # if (yrstub == "POSTasPOST"){
+  #   targeting$das_price_mean<-targeting$das_price_hat
+  #   }
+
+  if (modelname=="pre_coefsnc1"){
+    targeting_vars<-c(spstock_equation_prenc1,choice_equation_prenc1)
+    } else   if (modelname=="pre_coefs1"){
+      targeting_vars<-c(spstock_equation_pre1,choice_equation_pre1)
+    } else   if (modelname=="pre_coefsnc2"){
+      targeting_vars<-c(spstock_equation_prenc2,choice_equation_prenc2)
+    } else   if (modelname=="pre_coefs2"){
+      targeting_vars<-c(spstock_equation_pre2,choice_equation_pre2)
+    } else   if (modelname=="post_coefsnc2"){
+      targeting_vars<-c(spstock_equation_postnc2,choice_equation_postnc2)
+    } else   if (modelname=="post_coefsnc1"){
+      targeting_vars<-c(spstock_equation_postnc1,choice_equation_postnc1)
+    } else   if (modelname=="post_coefs1"){
+      targeting_vars<-c(spstock_equation_post1,choice_equation_post1)
+    } else   if (modelname=="post_coefs2"){
+      targeting_vars<-c(spstock_equation_post2,choice_equation_post2)
+    }else {
+      stop("Unrecognized model name")
+    }
+  
+  
+  
+  
+  targeting$das_cost<-targeting$das_price_mean*targeting$das_charge
+  
   # the counterfactual only: Compute multipliers, averaged over the the pre or post time  
-    if (yearly_savename =="counterfactual"){
+    if (yrstub == "POSTasPRE"){
     wm<-rbindlist(multipliers)
    mygroup<-c("hullnum", "MONTH", "spstock2")
     wm<-wm[, lapply(.SD,mean), by=mygroup]
   }else {
   wm<-multipliers[[idx]]
   }
-  wm[, gffishingyear:=NULL]
+  
+  #wm[, gffishingyear:=NULL]
   
   wo<-outputprices[[idx]]
-  wo[, gffishingyear:=NULL]
+  #wo[, gffishingyear:=NULL]
   
   wi<-inputprices[[idx]]
-  wi[, gffishingyear:=NULL]
+  #wi[, gffishingyear:=NULL]
   
   
   
@@ -57,7 +98,7 @@ for (wy in 2010:2015) {
 
 # My current 
 if("emean" %in% colnames(targeting)){
-  print("Yep, it's in there!")
+  print("Yep, emean is there!")
 } else {
   warning('emean hack, production predictions will be wrong')
   targeting$emean<-1
@@ -151,6 +192,10 @@ targeting<-wi[targeting, on=c("hullnum","doffy","spstock2")]
 targeting[, fuelprice_len:=fuelprice*len]
 targeting[, fuelprice_distance:=fuelprice*distance]
 
+#Archive choice_prev_fish to OG_choice_prev_fish and set choice_prev_fish=0
+setnames(targeting,"choice_prev_fish","OG_choice_prev_fish")
+targeting[, choice_prev_fish:=0]
+
 
 td_cols<-colnames(targeting)
 
@@ -160,7 +205,9 @@ td_cols<-colnames(targeting)
  quota_prices<-td_cols[grepl("^q_", td_cols)]
  lag_output_prices<-td_cols[grepl("^p_", td_cols)]
  output_prices<-td_cols[grepl("^r_", td_cols)]
-# notinsubs<-c(betavars,production_vars, alphavars, cmultipliers, lmultipliers, quota_prices, output_prices,lag_output_prices)
+ #day_limits<-td_cols[grepl("^dl_", td_cols)]
+ 
+ # notinsubs<-c(betavars,production_vars, alphavars, cmultipliers, lmultipliers, quota_prices, output_prices,lag_output_prices)
 
 betavars<-grep("^beta",colnames(targeting) , value=TRUE)
 alphavars<-grep("^alpha",colnames(targeting) , value=TRUE)
@@ -169,11 +216,16 @@ fyvars<-grep("^fy",colnames(targeting) , value=TRUE)
 monthvars<-grep("^month",colnames(targeting) , value=TRUE)
 
 idvars=c("id", "hullnum","spstock2", "doffy")
-necessary=c("q", "gffishingyear", "emean","nchoices", "MONTH")
-useful_vars=c("gearcat","post","h_hat","choice", "xb_hat", "log_h_hat","pr_hat")
+necessary=c("q", "gffishingyear", "emean","nchoices", "MONTH","das_cost")
 
-mysubs=c(idvars,necessary,useful_vars, targeting_vars, production_vars, fyvars, monthvars, betavars, alphavars, cmultipliers, lmultipliers, quota_prices, lag_output_prices, output_prices)
+xbcols<-grep("^xb_",colnames(targeting) , value=TRUE)
+prhatcols<-grep("^pr_hat_",colnames(targeting) , value=TRUE)
 
+useful_vars=c("gearcat","post","h_hat","choice", "log_h_hat","OG_choice_prev_fish")
+
+mysubs=c(idvars,necessary,useful_vars, targeting_vars, production_vars, fyvars, monthvars, betavars, alphavars, cmultipliers, lmultipliers, quota_prices, lag_output_prices, output_prices, xbcols, prhatcols)
+#this sometimes is needed if there are the same columns in the production and targeting equation, like "constant"
+mysubs<-unique(mysubs)
 targeting<-targeting[, ..mysubs]
 
 
@@ -190,6 +242,9 @@ sum(is.na(targeting))==0
 
 #the id is the distinct "hullnum-date" combination.  date encompasses gffishingyear and doffy.
 # so I really only need 2 key columns (id and spstock2)
+
+ targeting = merge (targeting, day_limits, by=c("spstock2", "doffy", "gffishingyear"), all.x=TRUE)
+
 setkeyv(targeting, c("id","spstock2"))
 targeting<-split(targeting, targeting$doffy)
 
@@ -201,7 +256,7 @@ gc()
 }
 #rm(list=ls())
 
-
+}
 
 
 

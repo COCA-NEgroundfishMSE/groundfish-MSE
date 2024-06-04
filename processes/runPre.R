@@ -36,11 +36,12 @@ timeString <- format(x = time,
 # define a directory name
 ResultDirectory <- paste('results', timeString, sep='_')
 dir.create(ResultDirectory, showWarnings = FALSE, recursive=TRUE)
+
 # Reults folders for economic models. Create them if necessary
+dir.create(file.path(ResultDirectory,"econ", "raw"), showWarnings = FALSE, recursive=TRUE)
+dir.create(file.path(ResultDirectory,"econ", "sim"), showWarnings = FALSE, recursive=TRUE)
+dir.create(file.path(ResultDirectory,"econ", "fig"), showWarnings = FALSE, recursive=TRUE)
 
-econ_results_location<-file.path(ResultDirectory,"econ","raw")
-
-dir.create(econ_results_location, showWarnings = FALSE, recursive=TRUE)
 dir.create(file.path(ResultDirectory,"sim"), showWarnings = FALSE, recursive=TRUE)
 dir.create(file.path(ResultDirectory,"fig"), showWarnings = FALSE, recursive=TRUE)
 
@@ -49,4 +50,13 @@ source('processes/loadLibs.R')
 
 # compile the c++ file and make available to R
 TMB::compile("assessment/caa.cpp")
+
+
+# need to get the mprocfile from set_om_parameters_global.R
+source('modelParameters/set_om_parameters_global.R')
+
+# Copy set_om_parameters_global.R and mprocfile into the results folder
+
+file.copy(file.path("modelParameters",mprocfile), file.path(ResultDirectory,"fig",mprocfile))
+file.copy(file.path("modelParameters","set_om_parameters_global.R"), file.path(ResultDirectory,"set_om_parameters_global.R"))
 

@@ -15,12 +15,21 @@ Toolbox](https://www.nefsc.noaa.gov/nft/ASAP.html).
 Using the ASAP option assumes that you have 2 things (locally) in the
 ‘/asessment/ASAP’ folder:
 
-1.  an ASAP.dat file with a given stock name. For example ‘codGOM.dat’
-2.  the ASAP3.exe
+* an ASAP.dat file with a given stock name. For example ‘codGOM.dat’, and either:
+* he ASAP3.exe executable, or  
+* a Linux ASAP3 executable. 
+
+A Linux ASAP3 will need to be compiled from source.  These are the steps you'll need to take to run ASAP3 natively in Linux.
+* Get ADMB. 
+* Get the ASAP3 source code. Rename asap3.tpl to ASAP3.tpl
+*  Use ADMB to compile ASAP3.tpl. See this [quick start](https://www.admb-project.org/downloads/admb-12.3/QuickStartLinux.html).
+*  Update the full.path.to.asap in runSetup.R
+*  Update the asapEst in get_ASAP.R
+
 
 *This option can be run locally or on the HPCC. If running on the HPCC
 the ASAP3.EXE should be in a folder called “EXE” on the same directory
-level as groundfish-MSE*
+level as groundfish-MSE.  It will be run using wine.*
 
 ### Functionality
 
@@ -46,3 +55,5 @@ operating model have the same structural assumption.
 
 The ASAP executable is run and then the results are saved as an .Rdata
 file with the same syntax as the .dat file for each year and simulation.
+
+

@@ -5,10 +5,9 @@
 # Debug using simple temperature trend that reduces variance? (T/F)
 simpleTemperature <- FALSE
 
+
 # Which management procedures csv do you want to read:
-mprocfile<-"mproc.csv"
-#mprocfile<-"mprocTest.csv"
-#mprocfile<-"mprocEcon.csv"
+mprocfile<-"mprocEconT.csv"
 
 #### Stock parameters ####
 
@@ -18,8 +17,9 @@ mprocfile<-"mproc.csv"
 # stockExclude <- 'haddockGB' (string) will leave haddockGB.R out of the analysis.
 # stockExclude <- NULL indludes all stocks.
 # Available stocks: haddockGB, codGOM, codGB, pollock, yellowtailflounderGB
-stockExclude <- c('haddockGB', 'codGB', 'pollock', 'yellowtailflounderGB')
+stockExclude<-NULL
 
+#stockExclude <- c('yellowtailflounderGB')
 #### historic assessment values #### AEW
 # if you want to use an input of historic assessment data
 # just fishing mortality for now
@@ -29,10 +29,11 @@ histAssess <- TRUE
 #### Structural parameters ####
 
 # number of times to repeat this analysis
-nrep <- 1
+nrep <- 20
+
 
 # First year to begin actual management
-fmyear <- 2019
+fmyear <- 2020
 
 # first year after the initial condition period. The initial condition period
 # simply fills up the arrays as necessary even before the burn-in period
@@ -90,6 +91,10 @@ anomFun <- median
 BrefScalar <- 0.5
 FrefScalar <- 0.75
 
+
+#################### BEGIN ECON GLOBAL PARAMETERS ##############################
+
+
 #### Helpful parameters ####
 # Scalars to convert things
 pounds_per_kg<-2.20462
@@ -106,17 +111,41 @@ econ_data_end<-2015
 ##############Stocks in the Economic Model #############################
 spstock2s<-c("americanlobster","americanplaiceflounder","codGB","codGOM","haddockGB","haddockGOM","monkfish", "other","pollock","redsilveroffshorehake","redfish","seascallop","skates","spinydogfish","squidmackerelbutterfishherring","summerflounder","whitehake","winterflounderGB","winterflounderGOM","witchflounder","yellowtailflounderCCGOM", "yellowtailflounderGB","yellowtailflounderSNEMA")
 
+
+
 ##############Independent variables in the targeting equation ##########################
 ### If there are different targeting equations, you can set there up here, then use their suffix in the mproc file to use these new targeting equations
 ### example, using ChoicEqn=small in the mproc file and uncommenting the next two lines will be appropriate for a logit with just 3 RHS variables.
 
-##spstock_equation_small=c("exp_rev_total", "fuelprice_distance")
-##choice_equation_small=c("fuelprice_len")
-spstock_equation_pre=c("exp_rev_total", "fuelprice_distance", "distance", "mean_wind", "mean_wind_noreast", "permitted", "lapermit", "choice_prev_fish", "partial_closure", "start_of_season")
-choice_equation_pre=c("wkly_crew_wage", "len", "fuelprice", "fuelprice_len")
+###########################Make sure you have the correct set of RHS variables.
+# Model 2 has a slightly different exp_rev_total variable.
 
-spstock_equation_post<-spstock_equation_pre
-choice_equation_post<-choice_equation_pre
+spstock_equation_prenc1=c("exp_rev_total", "fuelprice_distance", "distance", "mean_wind", "mean_wind_noreast", "permitted", "lapermit", "choice_prev_fish", "partial_closure", "start_of_season")
+choice_equation_prenc1=c("das_price_mean", "das_price_mean_len","wkly_crew_wage", "len", "fuelprice", "fuelprice_len")
+
+spstock_equation_pre1<-c(spstock_equation_prenc1,"constant")
+choice_equation_pre1<-choice_equation_prenc1
+
+
+spstock_equation_prenc2<-c("exp_rev_total_das", "fuelprice_distance", "distance", "mean_wind", "mean_wind_noreast", "permitted", "lapermit", "choice_prev_fish", "partial_closure", "start_of_season")
+choice_equation_prenc2<-c("wkly_crew_wage", "len", "fuelprice", "fuelprice_len")
+
+spstock_equation_pre2<-c(spstock_equation_prenc2,"constant")
+choice_equation_pre2<-choice_equation_prenc2
+
+
+#These are mostly placeholders
+spstock_equation_postnc1<-spstock_equation_prenc1
+choice_equation_postnc1<-choice_equation_prenc1
+
+spstock_equation_post1<-spstock_equation_pre1
+choice_equation_post1<-choice_equation_pre1
+
+spstock_equation_postnc2<-spstock_equation_prenc2
+choice_equation_postnc2<-choice_equation_prenc2
+
+spstock_equation_post2<-spstock_equation_pre2
+choice_equation_post2<-choice_equation_pre2
 ############## End Independent variables in the targeting equation ##########################
 
 ##############Independent variables in the Production equation ##########################
@@ -128,10 +157,19 @@ production_vars_pre=c("log_crew","log_trip_days","primary","secondary", "log_tra
 production_vars_post=c("log_crew","log_trip_days","primary","secondary", "log_trawl_survey_weight","log_sector_acl", "constant")
 ############## End Independent variables in the Production equation ##########################
 
+#################### quota price bits ##############################
+
+quarterly_output_price_loc<-"quarterly_prices_2022_03_04.csv"
+quotaprice_coefs_loc<-"quotaprice_coefs_exponential.Rds"
+#################### END ECON GLOBAL PARAMETERS ##############################
+
+
 #### Output ####
 # Years after the management period begins to break up the results. For
 # example, c(10, 20) would result in plots from 0-10 years after the mgmnt
-# period begins, 10-20 years and 20 years to the end of the series.
+# period begins, 11-20 years and 21 years to the end of the series.
+# The intervals years are set up (lower, upper].
+
 plotBrkYrs <- c(5, 10, 15)
 
 # Which sets of plots should be created? Set these objects to T/F
@@ -159,6 +197,10 @@ yearcounter<-0
 
 #Set up a list to hold the economic results
 revenue_holder<-list()
+fishery_output_holder<-list()
+fishery_prhat_holder<-list()
+fishery_quota_price_holder<-list()
+
 #these two lists will hold a vectors that concatenates (r, m, y, calyear, .Random.seed). They should be r*m*y in length.
 begin_rng_holder<-list()
 end_rng_holder<-list()

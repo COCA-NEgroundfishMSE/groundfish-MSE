@@ -6,7 +6,7 @@ mults <- read.dta13(file.path(rawpath, input_price_loc))
 mults<-as.data.table(mults)
 
 
-if (yearly_savename=="counterfactual"){
+if (yrstub=="POSTasPRE"){
   mults[, c(quotaprice_zero_cf) :=0]
 } 
  

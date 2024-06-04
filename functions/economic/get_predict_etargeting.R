@@ -24,15 +24,11 @@ B<-as.matrix(tds[, ..betavars])
 
 
 
-tds[, xb:=rowSums(X*B)]
-tds[, expu:=exp(xb)]
+tds[, expu:=exp(rowSums(X*B))]
 tds[, totexpu := sum(expu), by = id]
 tds[, prhat := expu/totexpu]
 
 
-#tds$xb<-rowSums(X*B)
-#tds$expu<-exp(tds$xb)
-#tds$prhat<- tds$expu/tds$totexpu
   
   return(tds)
 }

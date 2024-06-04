@@ -1,0 +1,66 @@
+
+# Executive Summary 
+
+## Research Questions:
+1. When do single-species fishery models applied to a multispecies fishery give different results than a multispecies fishery model applied to a multispecies fishery?  
+2. What happens when we join a structural (mechanistic) economic model to a stock dynamics model?
+
+## Motivation:
+We almost always do single-species bioeconomic models.  Most of the bioeconomic models out there are non-mechanistic (either metier based or even more aggregated than that).
+
+## Ideal methods:
+Ideally, we would compare the results of single- and multi-species simulation models to some holdout data and examine which fits better[^method1].  This will not work for two reasons:
+
+1. It’s really tricky to figure out the implementation error based on the 2004-2009 time period (no ACLs or even target TACS for some stocks). It’s not clear that the implementation errors from 2004-2009 can reasonably pooled with 2010-2018 data from the catch share system. 
+2.  We could use 2010-2018 data to parameterize the distribution of the implementation error, but that's just 9 data points - this might be very difficult.
+
+[^method1]: We’re doing something this for the Economics focused paper -- we estimate a behavioral model under Days-at-Sea managment (2004-2009) and then validate the parameters by simulating the 2010-2015 period, with certain adjustments. 
+
+## Actual Methods:  
+We construct stock dynamics models for three stocks of fish on Georges Bank that are managed together.
+We couple those models with an individual-based model of fishing grounded in economic principles. 
+We apply an HCR to get target *F*s and catch limits for the modeled stocks.  
+We then conduct four sets of “matched” simulations for a moderate number of years (say 15-30):
+
+
+Simulation 1B - Multispecies bioeconomic:  If the aggregate quotas are reached for a stock, fishing for all regulated groundfish by vessels in the groundfish fishery in that area ceases.
+Vessels that want to fish in that area could "declare out" of groundfish, but they cannot land groundfish and their catch does not count against the groundfish catch limits. 
+This scenario closely mimics the current catch share system for multispecies.  
+
+Simulation 2B -“single-species” bioeconomic -- if the aggregate quota is reached for a stock, fishing for only that stock stops.  
+Perfect avoidance (fishermen somehow avoid all of the closed stock).  
+
+<!---
+\begin{align}
+F_{real}& = F_{advice}*\varepsilon\\
+\varepsilon &= \frac{F_{real}}{F_{advice}}
+\end{align}
+--->
+  
+For both of these simulations, we can compute realized $F$ and therefore the implementation error in any year.
+We characterize the distribution of "implementation error" for our stocks (that is assumed to be i.i.d, probably a log-normal or half normal). 
+We will either fit a distribution or draw directly out of those error terms.
+We then simulate the "traditional" fisheries model with random implementation error implied by those distributions[^method2].
+This mimics an MSE-implementation error approach.  
+
+Simulation 1T Multispecies traditional: apply a traditional fisheries model where the implementation errors come from the Simulation 1B.
+
+Simulation 2T Singlespecies traditional: apply a traditional fisheries model where the implementation errors come from the Simulation 2B.
+
+Compare "outputs" from 1B and 1T, 2B and 2T.  My working hypothesis is that some interesting metrics will be different between 1B and 1T.  And that most metrics will the same for 2B and 2T.  
+
+[^method2]: In the multispecies catch-share management model, the implementation error terms for species i are likely to be autocorrelated.  And they are likely to be (inversely) correlated with the error terms for species j. This procedure rules out both of those correlations.
+
+##  Intuition
+Models 1B and 2B are models of how we think the fishery operates. Generating a distribution of implementation errors and then constructing a single-species model is similar to the way MSE's are done.  
+
+
+## Output metrics
+Our metrics will have to be “fleet level” revenue from the “modeled” species?  Also biomass trajectories and overfished/overfishing.  The “partial” results (say revenue from haddockGB+codGB+winterGB) may be very misleading compared to “total revenue”.  We probably want to do just a relatively short term scenario and initialize the simulation from approximately 2010 levels.
+
+We will evaluate the sensitivity of our results to:
+
+  #. HCRs?
+  #. Output prices? (prefer not to)
+  #. Prefer not to evaluate with respect to climate change things or life history parameters?
+

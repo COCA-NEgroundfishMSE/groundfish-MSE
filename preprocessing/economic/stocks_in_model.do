@@ -1,8 +1,7 @@
 version 15.1
-use "$inputdir/$datafilename" if gffishingyear==2011, clear
+use "${inputdir}/${datafilename}" if gffishingyear==2011, clear
 keep spstock2
-dups, drop terse
-drop _expand
+duplicates drop
 
 
 

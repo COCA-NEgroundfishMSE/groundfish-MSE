@@ -1,0 +1,90 @@
+We construct closed-loop operating model for five stocks of groundfish: Georges Bank cod, Georges Bank haddock, Georges Bank yellowtail flounder, Gulf of Maine Cod, and pollock.
+These stocks are managed jointly and many are caught jointly.  
+We couple those models with an individual-based model of fishing grounded in economic principles. 
+We apply an HCR to get target *F*s and catch limits for the modeled stocks.  
+
+We then conduct three sets of “matched” simulations for a moderate number of years:
+
+Simulation 1 - A multispecies bioeconomic model :  If the aggregate quotas are reached for a stock, fishing for all regulated groundfish by vessels in the groundfish fishery in that area ceases.  Vessels that want to fish in that area could "declare out" of groundfish, but they cannot land groundfish and their catch does not count against the groundfish catch limits.  This scenario closely mimics the current catch share system for multispecies.  We use the target and realized values of $F$ to estimate two parameters  - a systematic difference parameter ($\hat{ie}_{bias}$) and a noise parameter $\hat{ie}_{F}$ for each of the stocks.      
+
+Simulation 2: apply a traditional fisheries model where the implementation errors come from the Simulation 1B.
+
+Simulation 3: apply a traditional fisheries model where the implementation errors come from historical data.
+
+Differences between Simulations 1 and 3 illustrate the differences that arise from using a mechanistic (structural) economic model for fishery removals instead of an phenomenological model of $F$.
+These differences could arise because  A B C.
+
+
+## A structural economic model of targeting 
+
+Our economic model is taken directly from @Birkenbach2022; we briefly review the main components of the economic model so the reader can gain some intuition about the strengths and weaknesses inherent in this approach.
+The economic models is an individual-level microeconometric examination of trip-taking behavior of 286 vessels that are responsible for nearly all of the commercial landings and revenue from the groundfish fishery.
+We classify these vessels into two groups: vessels that primarily use trawl gear and vessels that primarily use gillnet gear. 
+Although we refer to these as the "trawl" and "gillnet" fleets, they are not constrained to use this gear.
+The targeting component of the model is estimated at the day level; fishing firms choose to target a stock of fish from their choice set based on their expected revenue from targeting that stock, cost proxies (like fuel prices, distances, vessel size, opportunity costs of labor), and environmental conditions (like wind speed).
+We also include an indicator for state dependence: firms tend to target the same stock as they targeted on the previous day [@Stafford2018.]
+In theory, fishing vessels can choose to fish for nearly anything in the ocean and every stock could be in the choice set for all vessels.
+However, the econometric models become intractable when the choice sets are large, so the choice sets for both fleets narrowed down based on the frequency that a stock was targeted and the proportion of total revenue derived from that stock at the fleet level.
+This leads to slightly different choice sets for each fleet: for example, spiny dogfish is in the gillnet choice set, but not the trawl fleet choice set. 
+Redfish was in the trawl choice set, but not the gillnet choice set.
+Firms in both fleets had a "no fish" option in their choice set and an "other" option that represented fishing that was not explicitly modeled.
+One of the most important drivers of fishing behavior is the firms expectations of revenue derived from a particular target. 
+These expectations are modeled in a two-step processs: first, econometric model is estimated that relates the harvest of a target stock to inputs like crew, trip length, a biomass index, catch limits, and whether a stock was a target or secondarily caught. 
+Second, two sets of vessel-, month-, and year-specific multipliers based on historical fishing outcomes are are constructed. 
+These convert the catch of target species into both the catch of all species and the landings of all species.
+Some catch may not be landed because of regulations on minimums sizes.
+This step allows us to simulate expected revenues as the summation of price multiplied by landings minus any quota costs.
+The choice occasion for the econometric model is at the day level. 
+
+## A model of quota prices
+
+The model of quota prices is built on the findings of @Lee2022, who estimate a two-stage model to investigate the determinants of groundfish quota prices.
+In the first step, transactions data are used to estimate the prices of individual stocks of quota.
+In the second stage, a hurdle model is used to understand the determinants of quota prices. 
+Increases in fish prices are found to increase quota prices while decreases in quota remaining are found to both increase the likelihood that quota trades at a positive price and increase the price of that quota.
+We use model A3, a model without spatial lag terms from the Appendix of @Lee2022.
+Every quarter of the fishing year, we compute the amount of quota remaining for each of the allocated stocks of groundfish and simulate the resulting quota prices. 
+
+## A model of the fishery 
+
+## A model of stock dynamics
+
+## Linking the economic and stock dynamics models
+There are two links between the economic and stock dynamics models. 
+The first link is through the expected harvest function: changes in catch limits and the biomass index change the amount of fish that a firms will expect to catch. 
+This, in turn, changes the expected revenues from each of the targeted stocks in the choice set and can lead to changes in targeting decisions.
+
+The second feedback link between the economic and stock dynamics models occurs through the harvest control rule and quota remaining.
+The harvest control rule links SSB to $F$ and, in turn, a catch limit.
+Changes in quota remaining (the catch limit minus harvested fish) impact the quota prices: as quota becomes more scarce, the price of quota increases.
+This also changes the expected revenues from each of the targeted stocks in the choice set and can lead to changes in targeting decisions.
+When catch of stock $i$ is equal to the catch limit for stock $i$, we make two changes. <!---math notation would help here ---->
+First, firms cannot target that stock: we set expected revenue for stock $i$ to a large negative number.
+Second, while firms may catch that stock $i$ while targeting stock $j \neq i$, firms cannot land stock $i$ while it is targeting stock $j$.
+This implies that firms have an unrealistically limited capacity for adaptation: they continue to fish in a similar fashion whether or not the catch limit is reached - they simply discard when the catch limit is reached.
+As a robustness check, we assume *perfect avoidance*: when a catch limit is reached for stock $i$, firm do not encounter stock $i$.
+The best way to model behavior by this fleet when a catch limit is reached is unclear.
+Because firms must hold quota for all stocks they could catch in an area that they fish, this implies that if a catch limit for stock $l$ found in area $a$ (say Georges Bank haddock) is reached, all targeting of groundfish stock $j \neq l$ in area $a$ (say, Georges Bank cod and Georges Bank yellowtail flounder) would also be precluded.
+We evaluate the sensitivity of the outcomes by constructing an alternative set of regulations, in which firms can continue to target stocks $j$ in area $a$.
+This alternative set of regulations makes the most sense when combined with the *perfect avoidance* behavioral model because it seems unlikely that firms and managers would allow firms to continue to catch (and discard) a stock that reached it's catch limit.
+
+### Some assumptions and caveats
+The modeled fleet of 286 vessels is responsible for substantially all of the U.S. commercial fishing mortality. 
+However, we removed unreliable dealer and landing records pertaining to catch by "Codfather" Carlos Rafael’s fleet, which mislabeled catch to skirt quota limits (United States v. Rafael, 282 F. Supp. 3d 407, D. Mass. 2017).
+The implicit assumption here is that that quota controlled by those vessels is simply reallocated among the fleet.
+
+There are additional sources of fishing mortality that must be accounted for before we can reasonably claim to model total fishing mortality.
+First, there are additional sources of U.S. commercial fishing mortality-- these may be non-target catch (such as haddock that is caught in the herring fishery or groundfish caught by the scallop fishery) or catch by commercial vessels that are not managed in the catch share fisher (state waters only or "common pool" vessels [@Holzer2015]).  
+Second, there is U.S. recreational fishing mortality.
+In the Gulf of Maine, recreational anglers are allocated 33.7\% of the ACL for cod and 27.5% for haddock (75 Fed. Reg. 65,18359).
+For these sources of fishing mortality, we compute the fraction of the ACL that is caught by the non-modeled domestic fleet and assume that this fraction is constant in the future. 
+We do not include an implementation error for this fleet.
+Third, some of the modeled stocks of groundfish are transboundary stocks, with some mortality coming from the Canadian fleet.
+We have not figured out what to do there yet.
+
+We assume that 
+
+
+## Performance Metrics
+
+### Economic Performance Metrics

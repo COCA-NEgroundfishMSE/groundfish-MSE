@@ -1,0 +1,312 @@
+---
+title: "Untitled"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(here)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+file_to_readin<-"results_2023-04-24-"
+```
+
+I simulated from 2005-2020 using just the standard fisheries model.  I started the management procedure in 2005.  
+
+I believe the simulated trawl-survey units are mt/tow, but they may be kg/tow. I believe these 'inherit' the units of the weights-at-age vector(waa). I have not modified any of the outputs.
+
+The units that I have from the actual trawl survey are in kg/tow. They are an average of the spring and fall bottom trawl survey and they feed into the economic catch equations.
+
+
+```{r readin_data, include=TRUE}
+yrs <- 1851:2040
+
+#read in csv containing trawl survey index values, stock name, year.
+survey_weights<-readr::read_csv(here("data","data_raw", "trawlSurvey","trawl_survey_indices.csv"))
+#drop SNE Lobster
+survey_weights<-subset(survey_weights, !(spstock2=="AmericanLobster" & stock_abbrev=="SNE"))
+survey_weights<-survey_weights %>%
+  rename(gffishingyear=year) %>%
+  group_by(spstock2,gffishingyear) %>%
+  summarise(index_kg_average=mean(index_kg_average),
+            index_kg_FALL=mean(index_kg_FALL),
+            index_kg_SPRING=mean(index_kg_SPRING),
+            index_kg_SUMMER=mean(index_kg_SUMMER),
+            index_kg_WINTER=mean(index_kg_WINTER)
+  ) %>%
+  ungroup()
+
+#Lowercasing
+
+survey_weights<-survey_weights %>%
+  mutate(spstock2=str_to_lower(spstock2))%>%
+  mutate(spstock2=str_replace(spstock2,"gb","GB")) %>%
+  mutate(spstock2=str_replace(spstock2,"ccgom","CCGOM")) %>%
+  mutate(spstock2=str_replace(spstock2,"gom","GOM")) %>%
+  mutate(spstock2=str_replace(spstock2,"snema","SNEMA")) %>%
+  mutate(spstock2=str_replace(spstock2,"windowpanes","windowpaneS")) %>%
+  mutate(spstock2=str_replace(spstock2,"windowpanen","windowpaneN"))
+
+# Read in TACs
+catch_hist<-readr::read_csv(here("data","data_processed", "econ","annual_sector_catch_limits.csv"))
+
+
+# merge catch hist and actuals  on spstock year
+actuals<-left_join(survey_weights, catch_hist, by=c("spstock2","gffishingyear")) 
+
+
+# Read in results for omvalGlobal
+resNames <- grep(pattern = file_to_readin, # look for files containing this
+                 x = list.files(here(), full.names=TRUE),    # all files in the working directory
+                 value = TRUE)        # pring out the actual folder names
+
+ResultDirectory <- tail(sort(resNames), 1) # ID the most recent folder
+
+# Load in the stock-level simulation results
+fl <- list.files(file.path(ResultDirectory, 'sim'), pattern="omvalGlobal", full.names=TRUE)
+flLst <- list()
+for(i in 1:length(fl)){
+  load(fl[i])
+  flLst[[i]] <- omvalGlobal
+  names(flLst[[i]]) <- names(omvalGlobal)
+}
+
+# slice omvalGlobal
+ds<-NULL
+
+#NOTE, this is a little weird, because I am reading things flLst, but then this loop goes over the most recent omvalGlobal. 
+
+for(i in 1:length(omvalGlobal)){
+  #Just pick the index from one of the model runs
+  sumEconIW<-unlist(omvalGlobal[[i]]$sumEconIW[,1,])
+  sumEconIW<-as_tibble(sumEconIW)
+  sumEconIW$rep<-as.numeric(rownames(sumEconIW)) 
+  Econlong<-tidyr::pivot_longer(sumEconIW,1:ncol(sumEconIW)-1, names_to="yr", values_to="Index") 
+  
+  
+  SSB<-unlist(omvalGlobal[[i]]$SSB[,1,])
+  SSB<-as_tibble(SSB)
+  SSB$rep<-as.numeric(rownames(SSB)) 
+  SSB<-tidyr::pivot_longer(SSB,1:ncol(SSB)-1, names_to="yr", values_to="Simulated_SSB") 
+  
+  
+  
+  N<-unlist(omvalGlobal[[i]]$N[,1,])
+  N<-as_tibble(N)
+  N$rep<-as.numeric(rownames(N)) 
+  N<-tidyr::pivot_longer(N,1:ncol(N)-1, names_to="yr", values_to="Simulated_N") 
+  
+  
+  
+  F_full<-unlist(omvalGlobal[[i]]$F_full[,1,])
+  F_full<-as_tibble(F_full)
+  F_full$rep<-as.numeric(rownames(F_full)) 
+  F_full<-tidyr::pivot_longer(F_full,1:ncol(F_full)-1, names_to="yr", values_to="Simulated_F_full") 
+  
+  
+  R<-unlist(omvalGlobal[[i]]$R[,1,])
+  R<-as_tibble(R)
+  R$rep<-as.numeric(rownames(R)) 
+  R<-tidyr::pivot_longer(R,1:ncol(R)-1, names_to="yr", values_to="Simulated_R") 
+  
+  extracted <-dplyr::inner_join(Econlong, SSB, by=c("rep", "yr")) 
+  extracted<-  dplyr::inner_join(extracted, N, by=c("rep", "yr"))
+  extracted<-  dplyr::inner_join(extracted, R, by=c("rep", "yr"))
+  extracted<-  dplyr::inner_join(extracted, F_full, by=c("rep", "yr"))
+  extracted$stock<-names(omvalGlobal[i])
+  
+  ds<-rbind(ds,extracted)
+  extracted<-NULL
+}
+
+#strip off the nyear prefix
+ds$yr<-as.numeric(str_replace_all(ds$yr, "nyear",""))
+
+#Create year column with 'real' years
+ds$year<-yrs[ds$yr]
+
+#group (stock-year) means over the replicates. Join to actual data.
+means<-ds %>%
+  group_by(stock,year) %>%
+  summarise(sd=sd(Index),
+            Index=mean(Index),
+            Sim_SSB=mean(Simulated_SSB),
+            Sim_R=mean(Simulated_R),
+            Sim_F_full=mean(Simulated_F_full),
+            Sim_N=mean(Simulated_N)) %>%
+    left_join(actuals, by = c("stock" = "spstock2", "year" = "gffishingyear")) %>%
+  mutate(ratio_err=Index/index_kg_average)
+
+means<- means %>%
+  relocate(any_of(c("index_kg_average", "index_kg_FALL", "ratio_err","sd")), .after=Index)
+
+
+#scaling SSB by 10000 to get axis nice
+scaling<-10000
+
+
+```
+
+# Georges Bank Cod
+
+```{r codGB, eval=FALSE}
+
+
+#codGB 
+ggplot(data=means %>%
+         dplyr::filter(stock=="codGB") %>%
+         dplyr::filter(year>=2004 & year<=2020), aes(x=year)) + 
+      geom_line(aes(y = Sim_SSB/scaling), color = "darkred")  + 
+      geom_line(aes(y = Index), color="steelblue", linetype="twodash") +
+      geom_line(aes(y = index_kg_average), color="black" ) +
+  
+scale_y_continuous(
+  
+  # Features of the first axis
+  name = "Survey Index (?/tow)",
+  
+  # Add a second axis and specify its features
+  sec.axis = sec_axis( ~.*scaling, name="SSB(mt)")  
+) + 
+  labs(title="codGB", caption="Simulated SSB(red) and Trawl Survey (blue).  Actual Trawl Survey (Black)"
+  )
+
+means %>%
+  dplyr::filter(stock=="codGB") %>%
+  dplyr::filter(year>=2005 & year<=2020)
+
+```
+
+The simulated trawl survey is pretty good. It varies from about about 1x to 3x the average of the spring and fall. It's probably 
+
+# Pollock 
+
+```{r Pollock,eval=FALSE}
+
+#Pollock 
+ggplot(data=means %>%
+         dplyr::filter(stock=="pollock") %>%
+         dplyr::filter(year>=2004 & year<=2020), aes(x=year)) + 
+  geom_line(aes(y = Sim_SSB/scaling), color = "darkred")  + 
+  geom_line(aes(y = Index), color="steelblue", linetype="twodash") +
+  geom_line(aes(y = index_kg_average), color="black" ) +
+
+    scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Survey Index (?/tow)",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis( ~.*scaling, name="SSB(mt)")  
+  ) + 
+  labs(title="Pollock", caption="Simulated SSB(red) and Trawl Survey (blue).  Actual Trawl Survey (Black)"
+  )
+
+
+means %>%
+  dplyr::filter(stock=="pollock") %>%
+  dplyr::filter(year>=2005 & year<=2020)
+
+```
+
+The simulated pollock survey index is 4-40 times larger than the average of the spring and fall surveys.  Eyeballing it, I'd say we want to divide the pollock trawl index by a factor of 15.
+
+# Georges Bank haddock
+
+```{r haddockGB, eval=TRUE}
+
+
+#haddockGB 
+ggplot(data=means %>%
+         dplyr::filter(stock=="haddockGB") %>%
+         dplyr::filter(year>=2004 & year<=2020), aes(x=year)) + 
+  geom_line(aes(y = Sim_SSB/scaling), color = "darkred")  + 
+  geom_line(aes(y = Index), color="steelblue", linetype="twodash") +
+  geom_line(aes(y = index_kg_average), color="black" ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Survey Index (?/tow)",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis( ~.*scaling, name="SSB(mt)")  
+  ) + 
+  labs(title="haddockGB", caption="Simulated SSB(red) and Trawl Survey (blue).  Actual Trawl Survey (Black)"
+  )
+
+
+means %>%
+  dplyr::filter(stock=="haddockGB") %>%
+  dplyr::filter(year>=2005 & year<=2020)
+
+```
+The simulated GB haddock trawl doesn't match the actual. The patterns are completely wrong. I think this is because there's a big year class that shows up in 2014-2015. This doesn't show up in the data.  I think the best move is to adjust to the earlier part of the time series, where the simulated trawl survey is about 2-5 times larger than the actual. I think we'll  
+
+# Gulf of Maine Cod
+
+
+```{r codGOM,eval=FALSE}
+
+
+#codGOM 
+ggplot(data=means %>%
+         dplyr::filter(stock=="codGOM") %>%
+         dplyr::filter(year>=2004 & year<=2020), aes(x=year)) + 
+  geom_line(aes(y = Sim_SSB/scaling), color = "darkred")  + 
+  geom_line(aes(y = Index), color="steelblue", linetype="twodash") +
+  geom_line(aes(y = index_kg_average), color="black" ) +
+  scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Survey Index (?/tow)",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis( ~.*scaling, name="SSB(mt)")  
+  ) + 
+  labs(title="codGOM", caption="Simulated SSB(red) and Trawl Survey (blue).  Actual Trawl Survey (Black)"
+  )
+
+
+
+
+
+means %>%
+  dplyr::filter(stock=="codGOM") %>%
+  dplyr::filter(year>=2005 & year<=2020)
+```
+
+The simulated codGOM survey index is way too small. It's need to be adjusted by a factor of 10.
+
+
+# GB Yellowtail Flounder  
+
+```{r yellowtailflounderGB,eval=FALSE}
+
+#Yellowtail Flounder 
+ggplot(data=means %>%
+         dplyr::filter(stock=="yellowtailflounderGB") %>%
+         dplyr::filter(year>=2004 & year<=2020), aes(x=year)) + 
+  geom_line(aes(y = Sim_SSB/scaling), color = "darkred")  + 
+  geom_line(aes(y = Index), color="steelblue", linetype="twodash") +
+  geom_line(aes(y = index_kg_average), color="black" ) +
+
+    scale_y_continuous(
+    
+    # Features of the first axis
+    name = "Survey Index (?/tow)",
+    
+    # Add a second axis and specify its features
+    sec.axis = sec_axis( ~.*scaling, name="SSB(mt)")  
+  ) + 
+  labs(title="GB yellowtailflounder", caption="Simulated SSB(red) and Trawl Survey (blue).  Actual Trawl Survey (Black)"
+  )
+
+
+means %>%
+  dplyr::filter(stock=="yellowtailflounderGB") %>%
+  dplyr::filter(year>=2005 & year<=2020)
+
+```
+
+The simulated yellowtailflounderGB survey index is way to small. It needs to be adjusted up by a factor of 5.

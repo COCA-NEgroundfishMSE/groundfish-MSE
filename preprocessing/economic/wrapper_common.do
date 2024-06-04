@@ -5,7 +5,7 @@ This set of data processing is the same for all of the different scenarios.
 So we only need to run this once. And run this before you run the other wrappers
 
 */
-global projectdir $MSEprojdir 
+global projectdir $MSE_network 
 *global projectdir "/home/mlee/Documents/projects/GroundfishCOCA/groundfish-MSE"
 *global projectdir "C:/Users/abirken/Documents/GitHub/groundfish-MSE"
 
@@ -16,34 +16,90 @@ global bio_data "$projectdir/data/data_processed/catchHistory"
 
 
 
+/* read in and minimal process the targeting equations */
+/* There are a bunch; we'll read them all in */
+/* filenames for sters and outputs*/
 
-/* filenames for sters  and outputs*/
-global post_input_ster "postCSasclogitnc2.ster"
+/* NC2 post models */
+
+global input_ster "postCSasclogitnc2.ster"
+global gillnet_out "asclogit_gillnet_post_coefsnc2.txt"
+global trawl_out "asclogit_trawl_post_coefsnc2.txt"
+
+do "$codedir/asclogit_coef_export.do"
 
 
-global post_gillnet_out "asclogit_gillnet_post_coefs.txt"
-global post_trawl_out "asclogit_trawl_post_coefs.txt"
 
 
-global pre_input_ster "preCSasclogitnc2.ster"
-global pre_gillnet_out "asclogit_gillnet_pre_coefs.txt"
-global pre_trawl_out "asclogit_trawl_pre_coefs.txt"
+/*
+there are no post 2 models.
+there are no post 1 models.
+there are not post nc1 models.
+*/
+
+
+
+
+/* These are the pre models*/
+
+
+/* NC2 post models */
+
+global input_ster "preCSasclogitnc2.ster"
+global gillnet_out "asclogit_gillnet_pre_coefsnc2.txt"
+global trawl_out "asclogit_trawl_pre_coefsnc2.txt"
+
+
+do "$codedir/asclogit_coef_export.do"
+
+
+
+/* NC1 models */
+
+global input_ster "preCSasclogitnc1.ster"
+global gillnet_out "asclogit_gillnet_pre_coefsnc1.txt"
+global trawl_out "asclogit_trawl_pre_coefsnc1.txt"
+
+
+do "$codedir/asclogit_coef_export.do"
+
+
+/* 1 models */
+global input_ster "preCSasclogit1.ster"
+global gillnet_out "asclogit_gillnet_pre_coefs1.txt"
+global trawl_out "asclogit_trawl_pre_coefs1.txt"
+
+do "$codedir/asclogit_coef_export.do"
+
+/* 2 models */
+global input_ster "preCSasclogit2.ster"
+global gillnet_out "asclogit_gillnet_pre_coefs2.txt"
+global trawl_out "asclogit_trawl_pre_coefs2.txt"
+
+do "$codedir/asclogit_coef_export.do"
+
 
 
 
 /*construct prices, reshape multipliers, and bring both into the targeting dataset */
 global catch_hist_file "catchHist.csv"
 
+global canadian_catch_hist_file "Canadian_catchHist.csv"
+
+
+
 /*name of multiplier file*/
 
 global multiplier_file "multipliers.dta"
 global multiplier_out "reshape_multipliers.dta"
 
-global datafilename "data_for_simulations_mse.dta"
+global datafilename "data_for_simulations_POSTasPOST.dta"
 
 
 
-do "$codedir/asclogit_coef_export.do"
+
+
+
 do "$codedir/stocks_in_model.do"
 
 do "$codedir/recode_catch_limits.do"
