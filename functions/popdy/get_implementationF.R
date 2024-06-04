@@ -1,5 +1,8 @@
-
-
+# the get_implementationF implements 4 types of F
+#  advicenoError:  Fully recruited Fishing mortality is equal to the Advised level (F_full==F_fullAdvice)
+#  adviceWithError: F_full is normally distributed with log(mean)=(F_fullAdvice+ie_bias) and log(sd)=ie_F
+#  advicewithcatchbias:  Total catch is equal to the catch limit multiplied by (1+C_mult). C_mult is fixed, but there may be "change points"
+#  adviceWithCatchDeviations: Total catch is uniformly distributed with between "lowerbound*catch limit" and "upperbound*catch_limit"
 get_implementationF <- function(type, stock){
 
   within(stock, {

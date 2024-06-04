@@ -118,12 +118,12 @@ ie_bias <- 0 # % bias in implementation error
 ## implementation error of Catch Limit (iecl)
 ### Very few observations, baseline case is a uniform implementation error is uniformly distributed between  the upper (iecl_upper) and lower bounds (iecl_lower)
 ### These are parameterized using the pre-catch share time period.
-### Catch=ACL*(1+iecl).  A random draw where iecl=0 <--> Catch=ACL.
+### Catch=ACL*iecl.  A random draw where iecl=1 <--> Catch=ACL.
 # See /preprocessing/economic/readin_older_catchHist.do and compute_catch_limit_deviations.do
 
 iecl_type<-'uniform'
-iecl_upper<- .0695
-iecl_lower<- -0.4602
+iecl_upper<- 1.0695
+iecl_lower<- 0.5398
 
 
 

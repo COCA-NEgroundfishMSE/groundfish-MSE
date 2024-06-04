@@ -6,7 +6,7 @@
 
 # type: type of error implemented
 #       * "lognorm": lognormal errors
-#       * "uniform": idxE=index*(1+U[lb,ub])
+#       * "uniform": idxE=index*(U[lb,ub])
 #       
 # idx: vector of index values (e.g., survey total catch)
 # 
@@ -24,7 +24,7 @@ get_error_idx <- function(type, idx, par){
   }
   else if(type == 'uniform'){
     error_draw<- runif(1, min = par[1], max = par[2])
-    idxE <-(1+error_draw)*idx
+    idxE <-error_draw*idx
   }
   else{
     
