@@ -18,9 +18,16 @@
 
 
 get_error_idx <- function(type, idx, par){
-     
+  if(type == 'lognorm'){
       idxE <- rlnorm(1, meanlog = log(idx), # - par^2/2
                           sdlog = par)
+  }
+  else{
+    
+    stop('get_error_idx: type not recognized')
+    
+  }
+  
   return(idxE)
   
 }
