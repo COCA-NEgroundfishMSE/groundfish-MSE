@@ -4,7 +4,13 @@
 #  advicewithcatchbias:  Total catch is equal to the catch limit multiplied by (1+C_mult). C_mult is fixed, but there may be "change points"
 #  adviceWithCatchDeviations: Total catch is uniformly distributed with between "lowerbound*catch limit" and "upperbound*catch_limit"
 get_implementationF <- function(type, stock){
-
+  valid_types<-c("advicenoError", "adviceWithError", "advicewithcatchbias","adviceWithCatchDeviations")
+  
+  if(type %in% valid_types==FALSE){
+      stop('get_implementationF: type not recognized')
+  }
+  
+  
   within(stock, {
 
     if(type == 'advicenoError'){
@@ -99,13 +105,7 @@ get_implementationF <- function(type, stock){
                            M = natM[y],
                            waav = waa[y,])
     }
-    
-    else{
-
-      stop('get_implementationF: type not recognized')
-
-    }
-
+  
 
   })
 
