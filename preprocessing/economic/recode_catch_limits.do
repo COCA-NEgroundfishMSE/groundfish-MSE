@@ -72,7 +72,7 @@ save `canada'
 
 import delimited "$bio_data/$catch_hist_file", stringcols(_all) clear
 
-foreach var of varlist commercial sector smallmesh commonpool herringfishery recreational scallopfishery statewater other{
+foreach var of varlist directedfishery sector smallmesh commonpool herringfishery recreational scallopfishery statewater other{
 replace `var'="0" if strmatch(`var',"NA")
 }
 destring, replace

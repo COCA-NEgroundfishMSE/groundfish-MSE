@@ -63,3 +63,4 @@ variance
 varssave.tmp
 *.log
 .Rprofile
+!data/data_raw/catchHistory/Landings*.xlsx

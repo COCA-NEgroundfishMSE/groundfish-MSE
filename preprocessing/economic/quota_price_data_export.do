@@ -5,7 +5,6 @@ use `prices', clear
 
 drop if inlist(stockcode, 1818,9999)
 drop if fishing_year<=2009
-drop if fishing_year>2015
 notes drop _dta
 order fishing_year q_fy dateq stockcode stock_id spstock2 badj live_price* fGDP proportion_observed
 keep fishing_year q_fy dateq stockcode stock_id spstock2 badj live_price* fGDP proportion_observed
@@ -108,4 +107,11 @@ drop if inlist(stockcode,2,4)
 decode stockcode, gen(stock_string)
 rename fishing_year gffishingyear
 sort gffishingyear q_fy stockcode spstock2
+
+
+drop if gffishingyear>=2020
+
+export delimited gffishingyear q_fy stockcode stock_string spstock2 live_priceGDP fGDPtoSFD proportion_observed using "${MSE_network}/data/data_processed/econ/quarterly_pricesU_${vintage_string}.csv", delimiter(",") nolabel replace
+drop if gffishingyear>2015
+
 export delimited gffishingyear q_fy stockcode stock_string spstock2 live_priceGDP fGDPtoSFD proportion_observed using "${MSE_network}/data/data_processed/econ/quarterly_prices_${vintage_string}.csv", delimiter(",") nolabel replace
