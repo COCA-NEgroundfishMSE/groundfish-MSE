@@ -160,7 +160,7 @@ production_vars_post=c("log_crew","log_trip_days","primary","secondary", "log_tr
 #################### quota price bits ##############################
 
 quarterly_output_price_loc<-"quarterly_prices_2022_03_04.csv"
-quotaprice_coefs_loc<-"quotaprice_coefs_exponential.Rds"
+quotaprice_coefs_loc<-"quotaprice_coefs_exponentialNS.Rds"
 #################### END ECON GLOBAL PARAMETERS ##############################
 
 
