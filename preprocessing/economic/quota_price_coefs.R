@@ -9,12 +9,18 @@ badj_GDP=c("live_priceGDP","quota_remaining_BOQ", "Q2","Q3", "Q4","constant", "p
 
 
 #names of quota price files.
-quotaprice_coefs_in<-"quota_price_linearNS.txt"
-quotaprice_coefs_out<-"quotaprice_coefs_linear.Rds"
+#quotaprice_coefs_in<-"quota_price_linearNS.txt"
+#quotaprice_coefs_out<-"quotaprice_coefs_linearNS.Rds"
+
+#quotaprice_coefs_in<-"quota_price_linear.txt"
+#quotaprice_coefs_out<-"quotaprice_coefs_linear.Rds"
+
+#quotaprice_coefs_in<-"quota_price_exponential.txt"
+#quotaprice_coefs_out<-"quotaprice_coefs_exponential.Rds"
 
 
 quotaprice_coefs_in<-"quota_price_exponentialNS.txt"
-quotaprice_coefs_out<-"quotaprice_coefs_exponential.Rds"
+quotaprice_coefs_out<-"quotaprice_coefs_exponentialNS.Rds"
 
 
 
