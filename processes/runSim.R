@@ -42,21 +42,23 @@ rng_counter<-1
 yearitercounter<-0
 max_yiter<-nrep*nrow(mproc)*(nyear-fyear+1)
 
-#### Top rep Loop ####
-for(r in 1:nrep){
-  oldseed_mproc <- .Random.seed
-  print(paste0("rep # ",r))
+oldseed_mproc <- .Random.seed
+
+#### Top MP loop ####
+for(m in 1:nrow(mproc)){
+  #Restore the rng state to the value of oldseed_mproc.  For the same values of r, all the management procedures to start from the same RNG state.
+
+  .Random.seed<-oldseed_mproc
   
-  #### Top MP loop ####
-  for(m in 1:nrow(mproc)){
-    
+  print(paste0("model # ",m))
+  
+  #### Top rep Loop ####
+  for(r in 1:nrep){
     print(paste0("rep # ",r, " and model #", m))
     yearitercounter<-0
     iterpb <- txtProgressBar(min = 1, max = max_yiter, style = 3)
     
     manage_counter<-0
-    #Restore the rng state to the value of oldseed_mproc.  For the same values of r, all the management procedures to start from the same RNG state.  You probably want oldseed_mproc
-    .Random.seed<-oldseed_mproc
     begin_rng_holder[[rng_counter]]<-c(r,m,fyear-1,yrs[fyear-1],.Random.seed)
     rng_counter<-rng_counter+1
         #the econtype dataframe will pass a few things through to the econ model that govern how fishing is turned on/off when catch limits are reached, which sets of coefficients to use, and which prices to use
