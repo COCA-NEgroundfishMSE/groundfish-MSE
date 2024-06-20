@@ -194,6 +194,34 @@ for(r in 1:nrep){
     econ_baseline_averages<-econ_baseline_averages_backup  
     
     print(paste0("Model", m, " of rep # ",r, "done."))
+    ####################################  
+    #Save as we go along.
+    # Make up a stub for model 1 and replicate 1. Check to make sure this is does not exist.
+    if (r==1 & m==1){
+    td2 <- as.character(Sys.time())
+    td2 <- gsub(':', '', td2)
+    td2 <- paste(gsub(' ', '_', td2), round(runif(1, 0, 10000)), sep='_')
+    
+      if(file.exists(paste0(ResultDirectory,'/sim/omvalGlobal', td2, '.Rdata'))==TRUE){
+       stop("The omvalGlobal for model1 and rep1 already exists. This is a problem") 
+      }
+    
+      if(file.exists(paste0(ResultDirectory,'/sim/simlevelresults', td2, '.Rds'))==TRUE){
+        stop("The simlevel file for model1 and rep1 already exists. This is a problem") 
+      }
+    }
+    #### save results ####
+    cat("Saving Replicate ",r, "from model ",m ,". The time is ", as.character(Sys.time()))
+    
+    
+    omvalGlobal <- sapply(1:nstock, function(x) stock[[x]]['omval'])
+    names(omvalGlobal) <- sapply(1:nstock, function(x) stock[[x]][['stockName']])
+    save(omvalGlobal, file=paste0(ResultDirectory,'/sim/omvalGlobal', td2, '.Rdata'), compress=FALSE)
+    saveRDS(simlevelresults, file=paste0(ResultDirectory,'/sim/simlevelresults', td2, '.Rds'), compress=FALSE)
+    ####################################  
+    
+    
+    
   } #End of mproc loop
 } #End rep loop
 
@@ -230,16 +258,7 @@ big_loop
     dir.create(pth, showWarnings = FALSE)
   }
 
-  #### save results ####
-  omvalGlobal <- sapply(1:nstock, function(x) stock[[x]]['omval'])
-  names(omvalGlobal) <- sapply(1:nstock, function(x) stock[[x]][['stockName']])
-  save(omvalGlobal, file=paste0(ResultDirectory,'/sim/omvalGlobal', td2, '.Rdata'))
-  saveRDS(simlevelresults, file=paste0(ResultDirectory,'/sim/simlevelresults', td2, '.Rds'))
-  
-  
 
-  
-  
   
   if(runClass == "Local"){
     write.csv(mproc, file=file.path(ResultDirectory,"fig",mprocfile), row.names=FALSE)
