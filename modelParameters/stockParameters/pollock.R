@@ -123,7 +123,7 @@ ie_bias <- 0 # % bias in implementation error
 
 iecl_type<-'uniform'
 iecl_upper<- 1.0695
-iecl_lower<- 0.5398
+iecl_lower<- 0.15
 
 
 
