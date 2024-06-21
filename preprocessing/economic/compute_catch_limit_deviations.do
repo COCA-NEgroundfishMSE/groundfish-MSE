@@ -113,9 +113,10 @@ gen errs=(commercial_Catch/commercial_ACL)
 bysort stock period: egen lower_bound=min(errs)
 bysort stock period: egen upper_bound=max(errs)
 bysort stock period: egen mean_catch=mean(errs)
+bysort stock period: egen count_nomiss=count(total_ACL) 
 
 
 bysort stock period: gen mark=_n
-list stock period mean_catch upper_bound lower_bound  if mark==1, sepby(stock)
+list stock period count_nomiss mean_catch upper_bound lower_bound  if mark==1, sepby(stock)
 
-export delimited stock period mean_catch upper_bound lower_bound using "`export_csv'\catch_limit_deviations.csv" if mark==1, replace
+export delimited stock period count_nomiss mean_catch upper_bound lower_bound using "`export_csv'\catch_limit_deviations.csv" if mark==1, replace
