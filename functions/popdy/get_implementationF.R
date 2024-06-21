@@ -76,9 +76,10 @@ get_implementationF <- function(type, stock){
  
     
       else if(type == 'adviceWithCatchDeviations'){
-        # type == 'adviceWithCatchDeviations' is type='advicewithcatchbias', except for one difference:
-        # codCW2[y] <- sum(codCW[y,]) + (sum(codCW[y,]) * C_mult)
-        # C_mult is instead a random draw on a uniform distribution.
+        # type == 'adviceWithCatchDeviations' is type='advicewithcatchbias', except for two differences:
+        # 1.  codCW2[y] <- sum(codCW[y,]) + (sum(codCW[y,]) * C_mult) becomes:
+        # codCW2[y] <- sum(codCW[y,]* C_mult
+        # 2. C_mult is a random draw on a uniform distribution.
         
         CN_temp[y,] <- get_catch(F_full=F_full[y], M=natM[y],
                                  N=J1N[y,], selC=slxC[y,]) + 1e-3
