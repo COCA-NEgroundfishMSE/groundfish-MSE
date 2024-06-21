@@ -180,6 +180,7 @@ for(m in 1:nrow(mproc)){
     for(i in 1:nstock){
       if(mproc$ImplementationClass[m]=="Economic"){
       stock[[i]] <- get_error_params(stock[[i]],fit_ie='lognorm',firstyear=fmyearIdx, lastyear=nyear)
+      stock[[i]] <- get_error_params(stock[[i]],fit_ie='uniform',firstyear=fmyearIdx, lastyear=nyear)
     }
 
       # also store the ie_F and ie_bias
