@@ -128,7 +128,9 @@ get_containers <- function(stockPar){
     avgprice_per_lb=yx0,
     ie_F_hat = NA,
     iebias_hat = NA,
-
+    iecl_lower_hat  = NA,
+    iecl_upper_hat  = NA,
+    
         
     # container to hold operating/assessment model results
     # (operating model-assessment model comparison)
@@ -199,6 +201,8 @@ get_containers <- function(stockPar){
       Rest = est,
       iebias_hat= save_vector_replicate, # An estimate of average difference between F_full and F_fullAdvice
       ie_F_hat = save_vector_replicate, # An estimate of the sdlog parameter for the implementation error distribution  
+      iecl_lower_hat = save_vector_replicate, # Upper bound of the ratio of Catch:ACL 
+      iecl_upper_hat  = save_vector_replicate,  # Lower bound of the ratio of Catch:ACL  
       Gini_stock_within_season_BKS=save_vector_ann, # Gini coefficient for within season timing. Only filled for economic models.
       ie_F = save_vector_replicate,
       ie_bias = save_vector_replicate
