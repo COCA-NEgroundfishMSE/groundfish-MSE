@@ -7,7 +7,7 @@ simpleTemperature <- FALSE
 
 
 # Which management procedures csv do you want to read:
-mprocfile<-"mproc.csv"
+mprocfile<-"mprocEconT2.csv"
 
 #### Stock parameters ####
 
@@ -29,11 +29,11 @@ histAssess <- TRUE
 #### Structural parameters ####
 
 # number of times to repeat this analysis
-nrep <- 5
+nrep <- 2
 
 
 # First year to begin actual management
-fmyear <- 2020
+fmyear <- 2015
 
 # first year after the initial condition period. The initial condition period
 # simply fills up the arrays as necessary even before the burn-in period
@@ -42,7 +42,8 @@ fmyear <- 2020
 fyear <- 38
 
 # maximum year predicted into the future
-mxyear <- 2040
+mxyear <- 2030
+mxyear <- 2022
 
 #### Burn-in parameters ####
 
@@ -171,6 +172,7 @@ quotaprice_coefs_loc<-"quotaprice_coefs_exponentialNS.Rds"
 # The intervals years are set up (lower, upper].
 
 plotBrkYrs <- c(5, 10, 15)
+plotBrkYrs <- c(1, 3, 5)
 
 # Which sets of plots should be created? Set these objects to T/F
 

@@ -13,7 +13,7 @@ source('processes/readin_previous_omval.R')
 # if on local machine (i.e., not hpcc) must compile the tmb code
 # (HPCC runs have a separate call to compile this code). Keep out of
 # runSetup.R because it is really a separate process on the HPCC.
-if(runClass != 'HPCC' ){
+if(runClass == 'local' ){
   source('processes/runPre.R', local=ifelse(exists('plotFlag'), TRUE, FALSE))
 }
 
