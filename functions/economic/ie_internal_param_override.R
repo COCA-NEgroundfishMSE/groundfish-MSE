@@ -1,4 +1,4 @@
-# Function to update the the scalar ie_F and ie_bias values in "stock" based on ie_F_hat and iebias_hat 
+# Function to update the the scalar scalar ie_F, ie_bias, iecl_lower, and iecl_upper values in "stock" based on ie_F_hat, iebias_hat, iecl_lower_hat, and iecl_upper_hat 
 # To be more general, it would be nice to update this to take two vectors as arguments like 
 #      to_update_names<-c("ie_F", "ie_bias") and
 #      from_source_names<-c("ie_F_hat", "iebias_hat")
@@ -32,6 +32,17 @@ ie_internal_param_override <- function(stock, replicate, from_model){
       ie_bias<-omval$iebias_hat[replicate, from_model]
     }
 
+    if(is.na(omval$iecl_lower_hat[replicate, from_model])==TRUE){
+      warning(paste0("iecl_lower_hat is NA in rep", replicate))
+    } else{
+      iecl_lower<-omval$iecl_lower_hat[replicate, from_model]
+    }
+    
+    if(is.na(omval$iecl_upper_hat[replicate, from_model])==TRUE){
+      warning(paste0("iecl_upper_hat is NA in rep", replicate))
+    } else{
+      iecl_upper<-omval$iecl_upper_hat[replicate, from_model]
+    }
   })
   
   return(out)
