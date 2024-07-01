@@ -103,11 +103,11 @@ kg_per_mt<-1000
 # Set the economic years that we'll use for simulation.
 
 first_econ_yr<-2010
-last_econ_yr<-2015
+last_econ_yr<-2019
 last_econ_index<-last_econ_yr-first_econ_yr+1
 
 econ_data_start<-2010
-econ_data_end<-2015
+econ_data_end<-2019
 
 ##############Stocks in the Economic Model #############################
 spstock2s<-c("americanlobster","americanplaiceflounder","codGB","codGOM","haddockGB","haddockGOM","monkfish", "other","pollock","redsilveroffshorehake","redfish","seascallop","skates","spinydogfish","squidmackerelbutterfishherring","summerflounder","whitehake","winterflounderGB","winterflounderGOM","witchflounder","yellowtailflounderCCGOM", "yellowtailflounderGB","yellowtailflounderSNEMA")
