@@ -132,9 +132,18 @@ if (!('alpha_fy2014' %in% pc_colnames)){
 if (!('alpha_fy2015' %in% pc_colnames)){
   production_coefs$alpha_fy2015<-0
 }
-
-
-
+if (!('alpha_fy2016' %in% pc_colnames)){
+  production_coefs$alpha_fy2016<-0
+}
+if (!('alpha_fy2017' %in% pc_colnames)){
+  production_coefs$alpha_fy2017<-0
+}
+if (!('alpha_fy2018' %in% pc_colnames)){
+  production_coefs$alpha_fy2018<-0
+}
+if (!('alpha_fy2019' %in% pc_colnames)){
+  production_coefs$alpha_fy2019<-0
+}
 
 
 production_coefs$spstock2<- gsub("gb","GB",production_coefs$spstock2)
