@@ -126,13 +126,22 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
     BThresh <- BrefScalar * BrefRPvalue
     FThresh <- FrefScalar * FrefRPvalue
     
-    # Determine whether the population is perceived to be overfished and whether 
-    # overfishing is perceived to be occurring
-
-    overfished <- ifelse(tail(parpop$SSBhat,1) < BThresh, 1, 0)
+    # Determine whether the population is perceived to be overfished 
+    # Determine whether a population is perceived to be rebuilt  
+    # Determine whether overfishing is perceived to be occurring
     
+    overfished <- ifelse(tail(parpop$SSBhat,1) < BThresh, 1, 0)
+    rebuilt <- ifelse(tail(parpop$SSBhat,1) >= BrefRPvalue, 1, 0)
     overfishing <- ifelse(tail(parpop$Fhat,1) > FrefRPvalue, 1, 0) #MDM
 
+    # Determine if stock is in rebuilding plan. 
+    #     Stock is in a rebuilding plan if it is overfished
+    #     Stock is in a rebuilding plan if it was in a rebuilding plan last year and stock is not rebuilt this year.
+    inrebuildingplan<-ifelse(overfished==1, 1, 
+                             ifelse(parpop$InRebuild==1 & rebuilt==0,1,0)
+    )
+    
+        
     #Ramp HCR
     if(tolower(parmgt$HCR) == 'slide'){
       F <- get_slideHCR(parpop, Fmsy=FThresh, Bmsy=BThresh)['Fadvice']
@@ -297,7 +306,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
 
     out <- list(F = F, RPs = c(FrefRPvalue, BrefRPvalue,FrefTRPvalue, BrefTRPvalue), 
                 ThresholdRPs = c(FThresh, BThresh), OFdStatus = overfished,
-                OFgStatus = overfishing, catchproj=catchproj) #AEW
+                OFgStatus = overfishing, catchproj=catchproj, inrebuildingplan=inrebuildingplan) #AEW
     
   #Plan B Approach
   }else if(parmgt$ASSESSCLASS == 'PLANB'){
@@ -321,7 +330,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
                   waav = parpop$waatrue_y)
     
     out <- list(F = trueF, RPs = c(NA, NA), OFdStatus=NA,
-                OFgStatus = NA) #AEW
+                OFgStatus = NA, inrebuildingplan=NA) #AEW
     
   }else{
     
