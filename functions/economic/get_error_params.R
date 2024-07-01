@@ -11,8 +11,8 @@
 get_error_params <- function(stock, fit_ie,firstyear, lastyear){
   valid_types<-c("lognorm", "uniform")
   
-  if(type %in% valid_types==FALSE){
-    stop('get_implementationF: type not recognized')
+  if(fit_ie %in% valid_types==FALSE){
+    stop('get_error_params: type not recognized')
   }
   
   out <- within(stock, {
