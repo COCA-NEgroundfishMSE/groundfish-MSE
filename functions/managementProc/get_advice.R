@@ -80,7 +80,7 @@ get_advice <- function(stock){
                        Fhat = tail(res$F.report, 1))
       })
     }
-
+tempstock$parpop$InRebuild<-stock$InRebuildingPlan[y-1]
 # Calculate Mohn's Rho values
   
   if(y > fmyearIdx){
@@ -136,6 +136,10 @@ get_advice <- function(stock){
     # Report overfishing status
       OFgStatus[y-1] <- gnF$OFgStatus
 
+    # Report Rebuilding Plan status. The time index is purposefully different from OFdStatus and OFgStatus
+      InRebuildingPlan[y] <- gnF$inrebuildingplan
+      
+      
     # Report maximum gradient component for CAA model
       mxGradCAA[y-1] <- ifelse(mproc[m,'ASSESSCLASS'] == 'CAA',
                                yes = rep$maxGrad,
