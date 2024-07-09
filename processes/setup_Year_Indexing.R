@@ -115,8 +115,8 @@ rm(num_eyears)
 
 if( any(random_sim_draw$join_econbase_yr <  2010| random_sim_draw$join_econbase_yr > 2019) ) stop('Economic base data not between 2010 and 2019.  Check your parameters ')
 
-if( any(random_sim_draw$join_outputprice_idx <  1| random_sim_draw$join_outputprice_idx > 9) ) stop('Economic output price data invalid (not between 2010 and 2019).  Check your parameters ')
+if( any(random_sim_draw$join_outputprice_idx <  1| random_sim_draw$join_outputprice_idx > 10) ) stop('Economic output price data invalid (not between 2010 and 2019).  Check your parameters ')
 
-if( any(random_sim_draw$join_inputprice_idx <  1| random_sim_draw$join_inputprice_idx > 9) ) stop('Economic input price data invalid (not between 2010 and 2019).  Check your parameters ')
+if( any(random_sim_draw$join_inputprice_idx <  1| random_sim_draw$join_inputprice_idx > 10) ) stop('Economic input price data invalid (not between 2010 and 2019).  Check your parameters ')
 
-if( any(random_sim_draw$join_mult_idx <  1| random_sim_draw$join_mult_idx > 9) ) stop('Economic multiplier data invalid (not between 2010 and 2019).  Check your parameters ')
+if( any(random_sim_draw$join_mult_idx <  1| random_sim_draw$join_mult_idx > 10) ) stop('Economic multiplier data invalid (not between 2010 and 2019).  Check your parameters ')
