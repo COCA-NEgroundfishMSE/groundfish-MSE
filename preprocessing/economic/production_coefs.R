@@ -58,6 +58,10 @@ production_coefs<-cbind(model,production_coefs)
 production_coefs$model<-as.character(production_coefs$model)
 rownames(production_coefs)<-NULL
 
+if(production_coef_in=="production_regs_actual_post_forR.txt"){
+  production_coefs$model<-paste0(production_coefs$model,"_1")
+}
+
 
 # parse the "model" string variable to facilitate merging to production dataset
 production_coefs<-separate(production_coefs,model,into=c("gearcat","spstock2","post"),sep="[_]", remove=TRUE)
