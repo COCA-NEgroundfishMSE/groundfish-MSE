@@ -64,14 +64,17 @@ if(is.na(constant_year)==FALSE){
       mutate(off=sim_year_idx %%num_eyears)
     offset<-offset$off
     
+    
     #Create a longer sequence and subset
     join_econbase_yr <-rep(econ_data_start:econ_data_end, length.out=nrow(random_sim_draw)+offset)
-    join_econbase_yr<-tail(join_econbase_yr, -1*offset)
+    if (offset!=0){
+      join_econbase_yr<-tail(join_econbase_yr, -1*offset)
+    }
     
     #cbind and cleanup
     random_sim_draw<-cbind(random_sim_draw, join_econbase_yr)
   } else {
-    stop('Economic base data does not contain 2010. Economic data not aligned to cal_year')
+    stop('Economic base data does not contain 2010. Economic data cannot be aligned to cal_year')
   }
 }
 
