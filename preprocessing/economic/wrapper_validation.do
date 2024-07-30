@@ -1,7 +1,7 @@
 version 15.1
 /* Order of doing stuff. */
 /* Run this file to load/prep the economic data */
-global projectdir $MSEprojdir 
+global projectdir $MSE_network 
 *global projectdir "/home/mlee/Documents/projects/GroundfishCOCA/groundfish-MSE"
 *global projectdir "C:/Users/abirken/Documents/GitHub/groundfish-MSE"
 

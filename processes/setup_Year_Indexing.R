@@ -64,14 +64,17 @@ if(is.na(constant_year)==FALSE){
       mutate(off=sim_year_idx %%num_eyears)
     offset<-offset$off
     
+    
     #Create a longer sequence and subset
     join_econbase_yr <-rep(econ_data_start:econ_data_end, length.out=nrow(random_sim_draw)+offset)
-    join_econbase_yr<-tail(join_econbase_yr, -1*offset)
+    if (offset!=0){
+      join_econbase_yr<-tail(join_econbase_yr, -1*offset)
+    }
     
     #cbind and cleanup
     random_sim_draw<-cbind(random_sim_draw, join_econbase_yr)
   } else {
-    stop('Economic base data does not contain 2010. Economic data not aligned to cal_year')
+    stop('Economic base data does not contain 2010. Economic data cannot be aligned to cal_year')
   }
 }
 
@@ -111,12 +114,12 @@ rm(num_eyears)
 
 
 
-#We have prepared 6 years of economic data (2010-2015), so we need to throw an error if we are out of range for any economic data that we want to import. 
+#We have prepared 10 years of economic data (2010-2019), so we need to throw an error if we are out of range for any economic data that we want to import. 
 
-if( any(random_sim_draw$join_econbase_yr <  2010| random_sim_draw$join_econbase_yr > 2015) ) stop('Economic base data not between 2010 and 2015.  Check your parameters ')
+if( any(random_sim_draw$join_econbase_yr <  2010| random_sim_draw$join_econbase_yr > 2019) ) stop('Economic base data not between 2010 and 2019.  Check your parameters ')
 
-if( any(random_sim_draw$join_outputprice_idx <  1| random_sim_draw$join_outputprice_idx > 6) ) stop('Economic output price data invalid (not between 2010 and 2015).  Check your parameters ')
+if( any(random_sim_draw$join_outputprice_idx <  1| random_sim_draw$join_outputprice_idx > 10) ) stop('Economic output price data invalid (not between 2010 and 2019).  Check your parameters ')
 
-if( any(random_sim_draw$join_inputprice_idx <  1| random_sim_draw$join_inputprice_idx > 6) ) stop('Economic input price data invalid (not between 2010 and 2015).  Check your parameters ')
+if( any(random_sim_draw$join_inputprice_idx <  1| random_sim_draw$join_inputprice_idx > 10) ) stop('Economic input price data invalid (not between 2010 and 2019).  Check your parameters ')
 
-if( any(random_sim_draw$join_mult_idx <  1| random_sim_draw$join_mult_idx > 6) ) stop('Economic multiplier data invalid (not between 2010 and 2015).  Check your parameters ')
+if( any(random_sim_draw$join_mult_idx <  1| random_sim_draw$join_mult_idx > 10) ) stop('Economic multiplier data invalid (not between 2010 and 2019).  Check your parameters ')

@@ -21,7 +21,7 @@ targeting_coefs<-readRDS(file.path(savepath,target_coefs))
 
 
 #for the counterfactual, we do something else -- we need average multipliers by hullnum, MONTH, spstock2.
-for (wy in 2010:2015) {
+for (wy in 2010:2019) {
     idx<-wy-2009
   
     
@@ -35,11 +35,22 @@ for (wy in 2010:2015) {
   tchars<-nchar(modelname)
   modelno<-substr(modelname,tchars,tchars)
 
+  # For modelno2, push exp_rev_total_das into exp_rev_total.  This makes my simulations easier, since I've renamed the beta_exp_rev_total_das to beta_exp_rev_total
+  # The code is set up to pull along exp_rev_total_das for modelno2, even if we don't use it. This is a bit of hack
   if(modelno=="2"){
-    targeting$exp_rev_total<-targeting$exp_rev_total_das
-  } else if(modelno=="1"){
-      # do nothing, we will match exp_rev_total automatically
-  } else {
+    if("exp_rev_total_das" %in% colnames(targeting)){
+          targeting$exp_rev_total<-targeting$exp_rev_total_das
+    } else if("exp_rev_total_das" %in% colnames(targeting)==FALSE){
+      targeting$exp_rev_total_das<-targeting$exp_rev_total
+    } 
+  }
+  
+  # For modelno1, create a das_cost variable from price and das_charge 
+  if(modelno=="1"){
+    targeting$das_cost<-targeting$das_price_mean*targeting$das_charge
+  } 
+  #Error handle
+  if(modelno %in%c("1","2")==FALSE){
     stop("Unrecognized model number ")
   }
 
@@ -53,19 +64,19 @@ for (wy in 2010:2015) {
   if (modelname=="pre_coefsnc1"){
     targeting_vars<-c(spstock_equation_prenc1,choice_equation_prenc1)
     } else   if (modelname=="pre_coefs1"){
-      targeting_vars<-c(spstock_equation_pre1,choice_equation_pre1)
+      targeting_vars<-c(spstock_equation_pre1,choice_equation_pre1,"das_cost")
     } else   if (modelname=="pre_coefsnc2"){
       targeting_vars<-c(spstock_equation_prenc2,choice_equation_prenc2)
     } else   if (modelname=="pre_coefs2"){
-      targeting_vars<-c(spstock_equation_pre2,choice_equation_pre2)
+      targeting_vars<-c(spstock_equation_pre2,choice_equation_pre2,"das_cost")
     } else   if (modelname=="post_coefsnc2"){
       targeting_vars<-c(spstock_equation_postnc2,choice_equation_postnc2)
     } else   if (modelname=="post_coefsnc1"){
       targeting_vars<-c(spstock_equation_postnc1,choice_equation_postnc1)
     } else   if (modelname=="post_coefs1"){
-      targeting_vars<-c(spstock_equation_post1,choice_equation_post1)
+      targeting_vars<-c(spstock_equation_post1,choice_equation_post1,"das_cost")
     } else   if (modelname=="post_coefs2"){
-      targeting_vars<-c(spstock_equation_post2,choice_equation_post2)
+      targeting_vars<-c(spstock_equation_post2,choice_equation_post2,"das_cost")
     }else {
       stop("Unrecognized model name")
     }
@@ -73,7 +84,6 @@ for (wy in 2010:2015) {
   
   
   
-  targeting$das_cost<-targeting$das_price_mean*targeting$das_charge
   
   # the counterfactual only: Compute multipliers, averaged over the the pre or post time  
     if (yrstub == "POSTasPRE"){
@@ -152,6 +162,10 @@ targeting$fy2012<-as.integer(targeting$gffishingyear==2012)
 targeting$fy2013<-as.integer(targeting$gffishingyear==2013)
 targeting$fy2014<-as.integer(targeting$gffishingyear==2014)
 targeting$fy2015<-as.integer(targeting$gffishingyear==2015)
+targeting$fy2016<-as.integer(targeting$gffishingyear==2016)
+targeting$fy2017<-as.integer(targeting$gffishingyear==2017)
+targeting$fy2018<-as.integer(targeting$gffishingyear==2018)
+targeting$fy2019<-as.integer(targeting$gffishingyear==2019)
 
 
 
@@ -216,7 +230,7 @@ fyvars<-grep("^fy",colnames(targeting) , value=TRUE)
 monthvars<-grep("^month",colnames(targeting) , value=TRUE)
 
 idvars=c("id", "hullnum","spstock2", "doffy")
-necessary=c("q", "gffishingyear", "emean","nchoices", "MONTH","das_cost")
+necessary=c("q", "gffishingyear", "emean","nchoices", "MONTH")
 
 xbcols<-grep("^xb_",colnames(targeting) , value=TRUE)
 prhatcols<-grep("^pr_hat_",colnames(targeting) , value=TRUE)

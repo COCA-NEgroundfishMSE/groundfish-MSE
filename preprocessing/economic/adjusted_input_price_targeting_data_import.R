@@ -21,7 +21,7 @@ targeting_coefs<-readRDS(file.path(savepath,target_coefs))
 
 
 #for the counterfactual, we do something else -- we need average multipliers by hullnum, MONTH, spstock2.
-for (wy in 2010:2015) {
+for (wy in 2010:2019) {
     idx<-wy-2009
   
     
@@ -152,6 +152,10 @@ targeting$fy2012<-as.integer(targeting$gffishingyear==2012)
 targeting$fy2013<-as.integer(targeting$gffishingyear==2013)
 targeting$fy2014<-as.integer(targeting$gffishingyear==2014)
 targeting$fy2015<-as.integer(targeting$gffishingyear==2015)
+targeting$fy2016<-as.integer(targeting$gffishingyear==2016)
+targeting$fy2017<-as.integer(targeting$gffishingyear==2017)
+targeting$fy2018<-as.integer(targeting$gffishingyear==2018)
+targeting$fy2019<-as.integer(targeting$gffishingyear==2019)
 
 
 

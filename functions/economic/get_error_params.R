@@ -15,10 +15,11 @@ get_error_params <- function(stock, fit_ie,firstyear, lastyear){
     stop('get_error_params: type not recognized')
   }
   
+  if (fit_ie== "lognorm"){
+    
   out <- within(stock, {
     
     # Fit the lognormal 
-    if (fit_ie== 'lognorm'){
       errs<-F_full[firstyear:lastyear]/F_fullAdvice[firstyear:lastyear]
       
       if (any(errs <= 0)){ 
@@ -31,15 +32,15 @@ get_error_params <- function(stock, fit_ie,firstyear, lastyear){
       #ieF_hat is simply the sdlog term.
       omval$ie_F_hat[r,m]<-ie_F_hat <- sqrt((iefit_n - 1)/iefit_n) * sd(iefit_lx)
       omval$iebias_hat[r,m]<-  iebias_hat<- exp(iefit_mx)-1
-      
-      # Fit the uniform 
-    }else if(fit_ie=='uniform') {
+   })
+  
+  }else if(fit_ie=="uniform") {
+    out <- within(stock, {
       catch_errs<-sumCW[firstyear:lastyear]/ACL[firstyear:lastyear]
       omval$iecl_lower_hat [r,m]<-iecl_lower_hat  <- min(catch_errs)
       omval$iecl_upper_hat  [r,m]<-iecl_upper_hat   <- max(catch_errs)
-    }
-    
-  })
+    })
+  }
   
   return(out)
   

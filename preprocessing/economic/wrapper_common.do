@@ -93,7 +93,7 @@ global canadian_catch_hist_file "Canadian_catchHist.csv"
 global multiplier_file "multipliers.dta"
 global multiplier_out "reshape_multipliers.dta"
 
-global datafilename "data_for_simulations_POSTasPOST.dta"
+global datafilename "data_for_simulations_mse.dta"
 
 
 

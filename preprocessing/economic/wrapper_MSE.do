@@ -23,5 +23,6 @@ global multiplier_file "multipliers.dta"
 
 
 do "$codedir/price_prep.do"
+
 do "$codedir/econ_data_split.do"
 

@@ -58,6 +58,10 @@ production_coefs<-cbind(model,production_coefs)
 production_coefs$model<-as.character(production_coefs$model)
 rownames(production_coefs)<-NULL
 
+if(production_coef_in=="production_regs_actual_post_forR.txt"){
+  production_coefs$model<-paste0(production_coefs$model,"_1")
+}
+
 
 # parse the "model" string variable to facilitate merging to production dataset
 production_coefs<-separate(production_coefs,model,into=c("gearcat","spstock2","post"),sep="[_]", remove=TRUE)
@@ -132,9 +136,18 @@ if (!('alpha_fy2014' %in% pc_colnames)){
 if (!('alpha_fy2015' %in% pc_colnames)){
   production_coefs$alpha_fy2015<-0
 }
-
-
-
+if (!('alpha_fy2016' %in% pc_colnames)){
+  production_coefs$alpha_fy2016<-0
+}
+if (!('alpha_fy2017' %in% pc_colnames)){
+  production_coefs$alpha_fy2017<-0
+}
+if (!('alpha_fy2018' %in% pc_colnames)){
+  production_coefs$alpha_fy2018<-0
+}
+if (!('alpha_fy2019' %in% pc_colnames)){
+  production_coefs$alpha_fy2019<-0
+}
 
 
 production_coefs$spstock2<- gsub("gb","GB",production_coefs$spstock2)

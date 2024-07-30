@@ -111,7 +111,8 @@ sort gffishingyear q_fy stockcode spstock2
 
 drop if gffishingyear>=2020
 
-export delimited gffishingyear q_fy stockcode stock_string spstock2 live_priceGDP fGDPtoSFD proportion_observed using "${MSE_network}/data/data_processed/econ/quarterly_pricesU_${vintage_string}.csv", delimiter(",") nolabel replace
-drop if gffishingyear>2015
+export delimited gffishingyear q_fy stockcode stock_string spstock2 live_priceGDP fGDPtoSFD proportion_observed using "${MSE_network}/data/data_processed/econ/quarterly_prices_${vintage_string}.csv", delimiter(",") nolabel replace
+/*drop if gffishingyear>2015
 
 export delimited gffishingyear q_fy stockcode stock_string spstock2 live_priceGDP fGDPtoSFD proportion_observed using "${MSE_network}/data/data_processed/econ/quarterly_prices_${vintage_string}.csv", delimiter(",") nolabel replace
+*/
