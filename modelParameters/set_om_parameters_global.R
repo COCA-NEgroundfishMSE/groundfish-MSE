@@ -33,7 +33,7 @@ nrep <- 2
 
 
 # First year to begin actual management
-fmyear <- 2015
+fmyear <- 2020
 
 # first year after the initial condition period. The initial condition period
 # simply fills up the arrays as necessary even before the burn-in period
@@ -43,7 +43,6 @@ fyear <- 38
 
 # maximum year predicted into the future
 mxyear <- 2030
-mxyear <- 2022
 
 #### Burn-in parameters ####
 
