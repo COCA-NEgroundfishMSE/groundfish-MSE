@@ -80,7 +80,7 @@ get_advice <- function(stock){
                        Fhat = tail(res$F.report, 1))
       })
     }
-tempstock$parpop$InRebuild<-stock$InRebuildingPlan[y-1]
+tempStock$parpop$InRebuild<-stock$InRebuildingPlan[y-1]
 # Calculate Mohn's Rho values
   
   if(y > fmyearIdx){
