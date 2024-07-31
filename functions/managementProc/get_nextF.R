@@ -144,7 +144,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
         
     #Ramp HCR
     if(tolower(parmgt$HCR) == 'slide'){
-      F <- get_slideHCR(parpop, Fmsy=FThresh, Bmsy=BThresh)['Fadvice']
+      F <- get_slideHCR(parpop, FFlat=FThresh, BBreakpoint=BThresh)['Fadvice']
     }
 
     #Threshold HCR
