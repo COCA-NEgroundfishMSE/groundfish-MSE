@@ -18,6 +18,7 @@ get_fillRepArrays <- function(stock){
     omval$F_full[r,m,] <- F_full
     omval$sumCW[r,m,] <- sumCW
     omval$OFdStatus[r,m,] <- OFdStatus
+    omval$InRebuildingPlan [r,m,] <- InRebuildingPlan
     omval$mxGradCAA[r,m,] <- mxGradCAA
     omval$F_fullAdvice[r,m,] <- F_fullAdvice #AEW
     omval$ACL[r,m,] <- ACL #AEW
