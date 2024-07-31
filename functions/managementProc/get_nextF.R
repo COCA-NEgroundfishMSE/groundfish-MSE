@@ -146,6 +146,17 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
     if(tolower(parmgt$HCR) == 'slide'){
       F <- get_slideHCR(parpop, FFlat=FThresh, BBreakpoint=BThresh)['Fadvice']
     }
+    
+    #Ramp HCR that is rebuilding Aware
+    if(tolower(parmgt$HCR) == 'sliderebuildaware'){
+      
+      if(inrebuildingplan==0){
+        F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR1, BBreakpoint=BThresh)['Fadvice']
+      }
+      else if (inrebuildingplan==1){
+        F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR2, BBreakpoint=BThresh)['Fadvice']
+      }
+    }
 
     #Threshold HCR
     else if(tolower(parmgt$HCR) == 'simplethresh'){
