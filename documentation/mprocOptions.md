@@ -24,6 +24,8 @@ Refers to the shape of the harvest control rule. Options are:
 
 Status in New England groundfish management: This option (75% FMSY) is the Acceptable Biological Catch (ABC) control rule for many stocks that had not rebuilt on the expected schedule. 
 
+* **constFRebuildAware**: A modification of the ‘constant fishing mortality’ HCR that sets a lower F when a stock is in a rebuilding plan.
+
 * **simplethresh**: A ‘threshold’ HCR harvest changes target F as a simple step function of stock biomass, with F set to zero at a level of abundance (e.g., 50%SSBMSY; Punt, 2010). Variants of this HCR could be based on different biomass thresholds (Deroba et al., 2019; Feeney et al., 2019). Threshold HCRs have been applied in management of whales by the International Whaling Commission (Butterworth and Best, 1994). 
 
 Status in New England groundfish management: This option has not been implemented.
@@ -40,9 +42,14 @@ Status in New England groundfish management: This option has not been implemente
 ## HCR_PAR1
 A parameter to pass through to the harvest control rule
 
+* **constFRebuildAware**: This is the scaling of F when the fishery is not in a rebuilding plan. A value of 0.75 indicates that that F should be set at 75% of $F_{MSY}$.  $0.75F_{MSY}$.
+
+
 
 ## HCR_PAR2
 A second parameter to pass through to the harvest control rule
+
+* **constFRebuildAware**: This is the scaling of F when the fishery *is* in a rebuilding plan. A value of 0.75 indicates that that F should be set at 75% of $F_{MSY}$.  $0.75F_{MSY}$.
 
 
 ## FREF_TYP
