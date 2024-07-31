@@ -37,6 +37,14 @@ Status in New England groundfish management: This option has not been implemente
 * **NA**: A possible value for situations where there is no harvest control rule (e.g., if using a planB assessment method -- that method gives catch advice directly).
 
 
+## HCR_PAR1
+A parameter to pass through to the harvest control rule
+
+
+## HCR_PAR2
+A second parameter to pass through to the harvest control rule
+
+
 ## FREF_TYP
 Refers to the method for developing the F reference point (i.e., a proxy for F<sub>MSY</sub>).  Options are:
 

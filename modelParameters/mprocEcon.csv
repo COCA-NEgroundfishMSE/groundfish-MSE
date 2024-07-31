@@ -1,7 +1,7 @@
-ASSESSCLASS,HCR,FREF_TYP,FREF_PAR0,FREF_PAR1,BREF_TYP,BREF_PAR0,BREF_PAR1,RFUN_NM,RPInt,ImplementationClass,LandZero,CatchZero,EconType,EconName,EconData,MultiplierFile,OutputPriceFile,InputPriceFile,ProdEqn,ChoiceEqn
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,TRUE,Multi,MSE,full_targeting,sim_multipliers_post_MSE.Rds,output_prices_post_MSE.Rds,input_prices_post_MSE.Rds,post,post
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,TRUE,Multi,Validation,validation,sim_multipliers_post_valid.Rds,output_prices_post_valid.Rds,input_prices_post_valid.Rds,post,pre
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,TRUE,Multi,CF,counterfactual,sim_multipliers_pre_CF.Rds,output_prices_post_CF.Rds,input_prices_post_CF.Rds,pre,pre
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,FALSE,Multi,CF,counterfactual,sim_multipliers_pre_CF.Rds,output_prices_post_CF.Rds,input_prices_post_CF.Rds,pre,pre
-CAA,simplethresh,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,FALSE,Single,CF,counterfactual,sim_multipliers_pre_CF.Rds,output_prices_post_CF.Rds,input_prices_post_CF.Rds,pre,pre
+ASSESSCLASS,HCR,HCR_PAR1,HCR_PAR2,FREF_TYP,FREF_PAR0,FREF_PAR1,BREF_TYP,BREF_PAR0,BREF_PAR1,RFUN_NM,RPInt,ImplementationClass,LandZero,CatchZero,EconType,EconName,EconData,MultiplierFile,OutputPriceFile,InputPriceFile,ProdEqn,ChoiceEqn
+CAA,simplethresh,NA,NA,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,StandardFisheries,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+CAA,simplethresh,NA,NA,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,TRUE,Multi,MSE,full_targeting,sim_multipliers_post_MSE.Rds,output_prices_post_MSE.Rds,input_prices_post_MSE.Rds,post,post
+CAA,simplethresh,NA,NA,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,TRUE,Multi,Validation,validation,sim_multipliers_post_valid.Rds,output_prices_post_valid.Rds,input_prices_post_valid.Rds,post,pre
+CAA,simplethresh,NA,NA,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,TRUE,Multi,CF,counterfactual,sim_multipliers_pre_CF.Rds,output_prices_post_CF.Rds,input_prices_post_CF.Rds,pre,pre
+CAA,simplethresh,NA,NA,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,FALSE,Multi,CF,counterfactual,sim_multipliers_pre_CF.Rds,output_prices_post_CF.Rds,input_prices_post_CF.Rds,pre,pre
+CAA,simplethresh,NA,NA,FmsySim,-30,-1,SIM,-30,-1,hindcastMean,1,Economic,TRUE,FALSE,Single,CF,counterfactual,sim_multipliers_pre_CF.Rds,output_prices_post_CF.Rds,input_prices_post_CF.Rds,pre,pre
