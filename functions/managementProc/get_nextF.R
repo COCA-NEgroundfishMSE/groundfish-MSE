@@ -152,7 +152,20 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
       # added small value to F because F = 0 causes some estimation errors
       F <- ifelse(tail(parpop$SSBhat, 1) < BThresh, 0, FThresh)+1e-4
     }
+
+    #Threshold HCR that is rebuilding Aware
+    else if(tolower(parmgt$HCR) == 'simplethreshrebuildaware'){
+
+      if(inrebuildingplan==0){
+        F <- FrefRPvalue*parmgt$HCR_PAR1 
+      }
+      else if (inrebuildingplan==1){
+        F <- parmgt$HCR_PAR2
+      }
+    }
     
+    
+        
     #Constant fishing mortality HCR
     else if(tolower(parmgt$HCR) == 'constf'){
       F <- FThresh
