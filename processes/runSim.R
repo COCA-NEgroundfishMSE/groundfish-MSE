@@ -118,7 +118,7 @@ for(r in 1:nrep){
 
         }else if(mproc$ImplementationClass[m] == "StandardFisheries"){
           for(i in 1:nstock){
-            stock[[i]] <- get_implementationF(type = 'adviceWithError',
+            stock[[i]] <- get_implementationF(type = 'adviceWithCatchDeviations',
                                               stock = stock[[i]])
           } # End implementation error in standard fisheries
         }else{
