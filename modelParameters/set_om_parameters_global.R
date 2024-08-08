@@ -7,7 +7,7 @@ simpleTemperature <- FALSE
 
 
 # Which management procedures csv do you want to read:
-mprocfile<-"mprocEconT2.csv"
+mprocfile<-"mprocEconTestRA.csv"
 
 #### Stock parameters ####
 
@@ -30,7 +30,6 @@ histAssess <- TRUE
 
 # number of times to repeat this analysis
 nrep <- 2
-
 
 # First year to begin actual management
 fmyear <- 2020
@@ -171,7 +170,7 @@ quotaprice_coefs_loc<-"quotaprice_coefs_exponentialNS.Rds"
 # The intervals years are set up (lower, upper].
 
 plotBrkYrs <- c(5, 10, 15)
-plotBrkYrs <- c(1, 3, 5)
+#plotBrkYrs <- c(1, 3, 5)
 
 # Which sets of plots should be created? Set these objects to T/F
 
