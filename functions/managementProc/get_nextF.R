@@ -137,8 +137,9 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
     # Determine if stock is in rebuilding plan. 
     #     Stock is in a rebuilding plan if it is overfished
     #     Stock is in a rebuilding plan if it was in a rebuilding plan last year and stock is not rebuilt this year.
-    inrebuildingplan<-ifelse(overfished==1, 1, 
-                             ifelse(parpop$InRebuild==1 & rebuilt==0,1,0)
+    inrebuildingplan<-ifelse(overfished==1, 1,
+          ifelse(is.na(parpop$InRebuild), overfished,
+               ifelse(parpop$InRebuild==1 & rebuilt==0,1,0) )
     )
     
         
