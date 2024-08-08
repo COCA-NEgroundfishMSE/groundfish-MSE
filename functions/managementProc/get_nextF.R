@@ -183,7 +183,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
     }
     
     #Constant fishing mortality HCR that is rebuilding Aware
-    else if(tolower(parmgt$HCR) == constfrebuildaware){
+    else if(tolower(parmgt$HCR) == 'constfrebuildaware'){
       if(inrebuildingplan==0){
         F <- FrefRPvalue*parmgt$HCR_PAR1 
       }
