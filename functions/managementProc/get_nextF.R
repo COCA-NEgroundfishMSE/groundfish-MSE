@@ -135,13 +135,18 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
     overfishing <- ifelse(tail(parpop$Fhat,1) > FrefRPvalue, 1, 0) #MDM
 
     # Determine if stock is in rebuilding plan. 
+    #     If it's the first management year, parpop$InRebuild is NA. When this happens, just use "overfished"
     #     Stock is in a rebuilding plan if it is overfished
     #     Stock is in a rebuilding plan if it was in a rebuilding plan last year and stock is not rebuilt this year.
-    inrebuildingplan<-ifelse(overfished==1, 1,
-          ifelse(is.na(parpop$InRebuild), overfished,
-               ifelse(parpop$InRebuild==1 & rebuilt==0,1,0) )
-    )
-    
+
+    if(is.na(parpop$InRebuild)){
+      inrebuildingplan<-overfished
+    } else {
+      inrebuildingplan<-ifelse(overfished==1, 1,
+                          ifelse(parpop$InRebuild==1 & rebuilt==0,1,0))
+    } 
+      
+
         
     #Ramp HCR
     if(tolower(parmgt$HCR) == 'slide'){
