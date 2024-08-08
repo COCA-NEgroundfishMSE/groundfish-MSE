@@ -170,7 +170,7 @@ quotaprice_coefs_loc<-"quotaprice_coefs_exponentialNS.Rds"
 # The intervals years are set up (lower, upper].
 
 plotBrkYrs <- c(5, 10, 15)
-#plotBrkYrs <- c(1, 3, 5)
+plotBrkYrs <- c(1, 3, 7)
 
 # Which sets of plots should be created? Set these objects to T/F
 
