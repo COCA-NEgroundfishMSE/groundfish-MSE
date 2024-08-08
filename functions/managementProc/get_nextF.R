@@ -144,7 +144,18 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
         
     #Ramp HCR
     if(tolower(parmgt$HCR) == 'slide'){
-      F <- get_slideHCR(parpop, Fmsy=FThresh, Bmsy=BThresh)['Fadvice']
+      F <- get_slideHCR(parpop, FFlat=FThresh, BBreakpoint=BThresh)['Fadvice']
+    }
+    
+    #Ramp HCR that is rebuilding Aware
+    if(tolower(parmgt$HCR) == 'sliderebuildaware'){
+      
+      if(inrebuildingplan==0){
+        F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR1, BBreakpoint=BThresh)['Fadvice']
+      }
+      else if (inrebuildingplan==1){
+        F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR2, BBreakpoint=BThresh)['Fadvice']
+      }
     }
 
     #Threshold HCR
@@ -152,10 +163,33 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
       # added small value to F because F = 0 causes some estimation errors
       F <- ifelse(tail(parpop$SSBhat, 1) < BThresh, 0, FThresh)+1e-4
     }
+
+    #Threshold HCR that is rebuilding Aware
+    else if(tolower(parmgt$HCR) == 'simplethreshrebuildaware'){
+
+      if(inrebuildingplan==0){
+        F <- FrefRPvalue*parmgt$HCR_PAR1 
+      }
+      else if (inrebuildingplan==1){
+        F <- parmgt$HCR_PAR2
+      }
+    }
     
+    
+        
     #Constant fishing mortality HCR
     else if(tolower(parmgt$HCR) == 'constf'){
       F <- FThresh
+    }
+    
+    #Constant fishing mortality HCR that is rebuilding Aware
+    else if(tolower(parmgt$HCR) == constfrebuildaware){
+      if(inrebuildingplan==0){
+        F <- FrefRPvalue*parmgt$HCR_PAR1 
+      }
+      else if (inrebuildingplan==1){
+        F <- FrefRPvalue*parmgt$HCR_PAR0
+      }
     }
     
     #Step in fishing mortality HCR

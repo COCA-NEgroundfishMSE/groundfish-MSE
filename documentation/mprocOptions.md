@@ -24,9 +24,13 @@ Refers to the shape of the harvest control rule. Options are:
 
 Status in New England groundfish management: This option (75% FMSY) is the Acceptable Biological Catch (ABC) control rule for many stocks that had not rebuilt on the expected schedule. 
 
+* **constFRebuildAware**: A modification of the ‘constant fishing mortality’ HCR that sets a lower F when a stock is in a rebuilding plan.
+
 * **simplethresh**: A ‘threshold’ HCR harvest changes target F as a simple step function of stock biomass, with F set to zero at a level of abundance (e.g., 50%SSBMSY; Punt, 2010). Variants of this HCR could be based on different biomass thresholds (Deroba et al., 2019; Feeney et al., 2019). Threshold HCRs have been applied in management of whales by the International Whaling Commission (Butterworth and Best, 1994). 
 
 Status in New England groundfish management: This option has not been implemented.
+
+*  **simplethreshrebuildaware** : A modification of the simplethresh HCR, with F set to a user defined constant when the stock is in a rebuilding plan.
 
 * **slide**: A sliding control rule.  Similer to simplethresh, except when the estimated SSB is lower than the SSB reference point fishing is reduced though not all the way to zero. Instead, a line is drawn between [SSBRefPoint, FRefPoint] and [0, 0] and the advice is the value for F on that line at the corresponding estimate of SSB.
 
@@ -35,6 +39,23 @@ Status in New England groundfish management: This option has not been implemente
 * **step**: Step in fishing mortality. If the SSB decreased below the biomass threshold, this HCR uses a target F of 70% FMSY that has recently been applied to New England groundfish as a default Frebuild. If the SSB never decreased below the biomass threshold or increased to over SSBMSY after dropping below the biomass threshold, this HCR uses a target F at the F threshold. This alternative directly emulates an HCR used for some New England groundfish. National Standard Guidelines were amended in 2016 and these revisions reduced the need to identify an incidental bycatch ABC and indicated that Frebuild need not be recalculated after every assessment, making it less likely that Frebuild will be set to zero in response to short-term lags in rebuilding.
 
 * **NA**: A possible value for situations where there is no harvest control rule (e.g., if using a planB assessment method -- that method gives catch advice directly).
+
+
+## HCR_PAR1
+A parameter to pass through to the harvest control rule.  For the Rebuild aware HCRs, 
+
+* **constFRebuildAware**: This parameter scales $F_{MSY}$ when the fishery is not in a rebuilding plan. A value of 0.75 indicates that that F should be set at 75% of $F_{MSY}$.  $0.75F_{MSY}$.  
+
+* **simplethreshrebuildaware**: Defined identically to **constFRebuildAware**
+
+
+## HCR_PAR2
+A second parameter to pass through to the harvest control rule.  For the Rebuild aware HCRs, 
+
+* **constFRebuildAware**: This parameter scales $F_{MSY}$ when the fishery *is* in a rebuilding plan. A value of 0.75 indicates that that F should be set at 75% of $F_{MSY}$.  $0.75F_{MSY}$.
+
+* **simplethreshrebuildaware**: This is $F$.  Setting this to 0 is not recommended, instead set to something arbitrarily small,like 1e-4 (0.0001).
+
 
 
 ## FREF_TYP
