@@ -114,7 +114,7 @@ tempStock$parpop$InRebuild<-stock$InRebuildingPlan[y-1]
       gnF <- get_nextF(parmgt = mproc[m,], parpop = tempStock$parpop,
                        parenv = parenv,
                        RPlast = NULL, evalRP = TRUE,
-                       stock = tempStock)
+                       stockEnv = tempStock)
 
       tempStock$RPmat[y,] <- gnF$RPs
       tempStock$catchproj <- gnF$catchproj
@@ -125,7 +125,7 @@ tempStock$parpop$InRebuild<-stock$InRebuildingPlan[y-1]
         gnF <- get_nextF(parmgt = mproc[m,], parpop = tempStock$parpop,
                          parenv = parenv,
                          RPlast = tempStock$RPmat[y-1,], evalRP = FALSE,
-                         stock = tempStock)
+                         stockEnv = tempStock)
         tempStock$RPmat[y,] <- tempStock$RPmat[y-1,]
     }
     
