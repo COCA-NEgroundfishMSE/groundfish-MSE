@@ -29,7 +29,7 @@ get_predict_eproduction <- function(prod_ds){
   # bad way to smear
   #prod_ds$harvest_sim<- exp(prod_ds$harvest_sim + fx)*exp((prod_ds$rmse^2)/2)
   
-  #good way to smear
-  prod_ds[, harvest_sim:=(exp(harvest_sim))*emean]
+  #good way to smear. Ad-hoc adjustment so emean is no larger than 3.
+  prod_ds[, harvest_sim:=(exp(harvest_sim))*pmin(emean,3)]
 }
 
