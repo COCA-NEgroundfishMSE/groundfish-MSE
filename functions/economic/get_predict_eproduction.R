@@ -19,7 +19,7 @@ get_predict_eproduction <- function(prod_ds){
     Z<-as.matrix(prod_ds[, ..datavars])
   A<-as.matrix(prod_ds[,..alphavars])
   
-  prod_ds[, harvest_sim:=rowSums(Z*A)+q]
+  prod_ds[, harvest_sim:=rowSums(Z*A)+pmin(q,2)]
   
   #prod_ds$harvest_sim<-rowSums(Z*A)
   #prod_ds[, harvest_sim:=harvest_sim+q]
