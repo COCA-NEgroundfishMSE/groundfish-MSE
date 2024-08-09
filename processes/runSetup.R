@@ -127,6 +127,11 @@ if(!all(inTest)){
              'of your break years is outside the possible range.'))
 }
 
+# Error test that the HCRs supplied are actually coded up in get_nextF()
+stopifnot("An HCR supplied by mprocfile is not recognized"=tolower(mproc$HCR) %in% 
+  c('slide','sliderebuildaware','simplethresh','simplethreshrebuildaware',
+    'constf','constfrebuildaware','step'))
+
 
 # get all the necessary containers for the simulation
 stockCont <- list()
