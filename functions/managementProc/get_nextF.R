@@ -363,6 +363,8 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
     
     # Calculate what the corresponding true F is that matches with
     # the actual biomass-at-age in the current year
+    
+    # If you do plan B, return the previous inrebuildingplan value.
     trueF <- get_F(x = CWrec,
                   Nv = parpop$Ntrue_y, 
                   slxCv = parpop$slxCtrue_y, 
@@ -370,7 +372,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
                   waav = parpop$waatrue_y)
     
     out <- list(F = trueF, RPs = c(NA, NA), OFdStatus=NA,
-                OFgStatus = NA, inrebuildingplan=NA) #AEW
+                OFgStatus = NA, inrebuildingplan=parpop$InRebuild) #AEW
     
   }else{
     
