@@ -194,7 +194,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
         F <- FrefRPvalue*parmgt$HCR_PAR1 
       }
       else if (inrebuildingplan==1){
-        F <- FrefRPvalue*parmgt$HCR_PAR0
+        F <- FrefRPvalue*parmgt$HCR_PAR2
       }
     }
     
