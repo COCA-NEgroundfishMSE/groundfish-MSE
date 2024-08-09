@@ -160,7 +160,7 @@ get_nextF <- function(parmgt, parpop, parenv, RPlast, evalRP, stockEnv){
         F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR1, BBreakpoint=BThresh)['Fadvice']
       }
       else if (inrebuildingplan==1){
-        F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR2, BBreakpoint=BThresh)['Fadvice']
+        F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR2, BBreakpoint=BrefRPvalue*parmgt$HCR_PAR3)['Fadvice']
       }
     }
 
