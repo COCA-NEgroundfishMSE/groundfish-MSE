@@ -64,7 +64,7 @@ A second parameter to pass through to the harvest control rule.  For the Rebuild
 
 ## HCR_PAR3
 A third parameter to pass through to the harvest control rule.  For the Rebuild aware HCRs, 
-* **sliderebuildaware**: This is used to define the Threshold $B$ when the fishery *is* in a rebuilding plan. A line is drawn between [$SSBRefPoint*HCR\_PAR3, FRefPoint*HCR\_PAR2$] and [0, 0] and the advice is the value for F on that line at the corresponding estimate of SSB.
+* **sliderebuildaware**: This is used to define the Threshold $B$ when the fishery *is* in a rebuilding plan. A line is drawn between $[SSBRefPoint\*HCR\\_PAR3, FRefPoint\*HCR\\_PAR2]$ and [0, 0] and the advice is the value for F on that line at the corresponding estimate of SSB.
 
 
 
