@@ -19,7 +19,7 @@ get_predict_eproduction <- function(prod_ds){
     Z<-as.matrix(prod_ds[, ..datavars])
   A<-as.matrix(prod_ds[,..alphavars])
   
-  prod_ds[, harvest_sim:=rowSums(Z*A)+pmin(q,2)]
+  prod_ds[, harvest_sim:=rowSums(Z*A)+q]
   
   #prod_ds$harvest_sim<-rowSums(Z*A)
   #prod_ds[, harvest_sim:=harvest_sim+q]
@@ -30,6 +30,6 @@ get_predict_eproduction <- function(prod_ds){
   #prod_ds$harvest_sim<- exp(prod_ds$harvest_sim + fx)*exp((prod_ds$rmse^2)/2)
   
   #good way to smear. Ad-hoc adjustment so emean is no larger than 3.
-  prod_ds[, harvest_sim:=(exp(harvest_sim))*pmin(emean,3)]
+  prod_ds[, harvest_sim:=(exp(harvest_sim))*emean]
 }
 
