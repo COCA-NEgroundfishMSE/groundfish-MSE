@@ -72,7 +72,8 @@ for(i in 1:length(flLst[[1]])){
 
   get_plots(x=omval, stockEnv = stockPar[[i]], 
             dirIn=file.path(ResultDirectory, "sim"), dirOut=dirOut, 
-            boxnames=boxplot_these, rpnames=rp_these, trajnames=traj_these,breakyears=plotBrkYrs)
+            boxnames=boxplot_these, rpnames=rp_these, trajnames=traj_these,breakyears=plotBrkYrs, py0=10)
+  
 }
 
 
