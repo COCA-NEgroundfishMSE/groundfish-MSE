@@ -23,11 +23,12 @@ save "$inputdir/$datafilename", replace
 /* save year-by-year */
 
 foreach gfy of local yrloc {
-clear
-use "$inputdir/$datafilename" if gffishingyear==`gfy'
+preserve
+keep if gffishingyear==`gfy'
 cap rename log_tac log_sector_acl
 cap drop spstock year hullnum2
 
 save "$inputdir/${datafile_split_prefix}_`gfy'.dta", replace
+restore
 }
 

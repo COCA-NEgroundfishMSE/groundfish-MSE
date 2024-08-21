@@ -81,7 +81,8 @@ replace spstock2=subinstr(spstock2,"gom","GOM",.)
 replace spstock2=subinstr(spstock2,"gb","GB",.)
 
 save "$inputdir/$datafilename", replace
-
+tempfile alldata
+save `alldata', replace
 
 
 keep spstock2 post gffishingyear gearcat date price_lb price_lb_lag1
@@ -115,7 +116,7 @@ save "$inputdir/$output_prices", replace
 
 
 /*crew wage varies by vessel-spstock2 -- so does fuelprice */
-use "$inputdir/$datafilename", clear
+use `alldata', clear
 keep hullnum spstock2 post gffishingyear date wkly_crew fuelprice
 gen gfstart=mdy(5,1,gffishingyear)
 
