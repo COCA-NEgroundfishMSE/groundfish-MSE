@@ -8,11 +8,13 @@
 #        particular plots (e.g., temperature time series)
 
 # boxnames, rpnames, trajnames: performance measures you want to plot
+# breakyears are is a vector of breakpoints defined as years after fmyearIdx.
+    # breakyears=c(5,10,15) will divide the the plots into years 
+# py0 is the year before the management period to start the plots
+ 
 
+get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames, breakyears=plotBrkYrs, py0=37){
 
-
-get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
-  
   with(stockEnv, {
     # load some of the necessary variables for plotting by running the
     # setup file.
@@ -24,9 +26,6 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
   
     # model years
     # yrs <- (mxyear - length(temp)+1):mxyear
-    
-    # Year before the management period to start the plots
-    py0 <- 37 #5
     
     # Index for years that will be plotted for trajectories and such
     pyidx <- (fmyearIdx-py0+1):length(yrs)
@@ -43,7 +42,7 @@ get_plots <- function(x, stockEnv, dirIn, dirOut, boxnames, rpnames, trajnames){
 
     # Identify break points for selecting years to produce for each of the
     # boxplots and also names for each of the categories for printing
-    brkYrsIdx <- plotBrkYrs + fmyearIdx
+    brkYrsIdx <- breakyears + fmyearIdx
     brkYrsIdxExt <- c(0, brkYrsIdx, nyear)
     brkYrsNames <- yrs[c(1, brkYrsIdxExt)]
     brkYrsNames2 <- sapply(2:length(brkYrsNames), function(x) 
