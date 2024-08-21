@@ -1,0 +1,360 @@
+---
+title: "Illustrate Harvest Control Rules"
+author: "Min-Yang Lee"
+date: "2024-08-20"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(here)
+wd<-here()
+knitr::opts_knit$set(root.dir =wd)
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+```{r loadin_runSetup, include=FALSE}
+
+# Run the setup, load extra libraries, and save the incoming mprocfile into this directory 
+source("./processes/runSetup.R")
+library(kableExtra)
+
+#write.csv(mproc, file=here("documentation","economics","mprocIllustrateHCR.csv"), row.names=FALSE)
+# Reproducability is a little tricky, but you can read in this particular mprocfile later
+mproc<-read.csv(file=here("documentation","economics","mprocIllustrateHCR.csv"))
+mproc <- mproc %>%
+  mutate(mproc_id = row_number())
+
+```
+# Harvest Control Rules
+
+
+```{r set_scalars, include=FALSE}
+# Scalar value of F MSY is set to 0.25
+FrefRPvalue<-.25
+# Scalar value of BrefRPvalue is set to 1
+BrefRPvalue <- 1
+
+FThresh<-FrefScalar * FrefRPvalue
+BThresh <- BrefScalar * BrefRPvalue
+
+# Scalar value of BrefScalar  and FrefRPvalue are hardcoded for some CRs in the om_parameters.R
+
+
+# Graph options
+my_ymin<-0
+my_ymax<- FrefRPvalue
+
+
+```
+This document plots some example Rebuild-Aware Harvest Control rules.  These are state dependent HCRs, there is one control rule when the stock is in a rebuilding plan and another when it is not. 
+
+The in-rebuilding part of the HCR is undefined when biomass is above BMSY.  
+
+The "normal" part of the HCR is undefined when biomass is below MSST (Overfished Threshold). 
+
+
+We are setting an $FrefRPvalue=F_{MSY}=$ `r FrefRPvalue` and $BrefRPvalue=B_{MSY}=$ `r BrefRPvalue` to make graphing easier.  
+
+$FrefScalar$ and $BrefScalar$ are set in ``set_om_parameters_global.R`` and are used for the non- Rebuild Aware HCRs. 
+
+$BrefScalar=0.5$, so the $MSST=Overfished Threshold=\frac{1}{2}B_{MSY}=\frac{1}{2}$.
+
+$FrefScalar=0.75$, so the default fishing is 75\% of $F_{MSY}$.
+
+```{r readin_and_setup_data, include=FALSE}
+
+# List to store F as a function of B. One for in a rebuilding plan and one for 'normal'
+F_In_Rebuild<-list()
+F_Regular<-list()
+
+parpop<-list()
+
+# Vector of (B)iomass
+B<-seq(from=0, to=1.2, by=.05 )
+lenB<-length(B)
+
+
+
+for (m in 1:nrow(mproc)){
+
+parmgt<-mproc[m,]
+
+
+
+
+
+
+for (inrebuildingplan in 0:1){
+  Ftemp<-rep(0, length.out=lenB)
+  
+
+    for (Bpick in 1:lenB){
+      parpop$SSBhat<-B[Bpick]
+      
+        
+        
+      
+      
+      #Ramp HCR
+      if(tolower(parmgt$HCR) == 'slide'){
+        F <- get_slideHCR(parpop, FFlat=FrefRPvalue, BBreakpoint=BThresh)['Fadvice']
+      }
+      
+      
+      
+      #Ramp HCR that is rebuilding Aware
+      if(tolower(parmgt$HCR) == 'sliderebuildaware'){
+        
+        if(inrebuildingplan==0){
+          F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR1, BBreakpoint=BThresh)['Fadvice']
+        }
+        else if (inrebuildingplan==1){
+          F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR2, BBreakpoint=BrefRPvalue*parmgt$HCR_PAR3)['Fadvice']
+        }
+      }
+      
+      
+      
+      #Ramp HCR that is rebuilding Aware
+      if(tolower(parmgt$HCR) == 'sliderebuildaware'){
+        
+        if(inrebuildingplan==0){
+          F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR1, BBreakpoint=BThresh)['Fadvice']
+        }
+        else if (inrebuildingplan==1){
+          F <- get_slideHCR(parpop, FFlat=FrefRPvalue*parmgt$HCR_PAR2, BBreakpoint=BrefRPvalue*parmgt$HCR_PAR3)['Fadvice']
+        }
+      }
+      
+      #Constant fishing mortality HCR that is rebuilding Aware
+      if(tolower(parmgt$HCR) == 'constfrebuildaware'){
+        if(inrebuildingplan==0){
+          F <- FrefRPvalue*parmgt$HCR_PAR1 
+        }
+        else if (inrebuildingplan==1){
+          F <- FrefRPvalue*parmgt$HCR_PAR2
+        }
+      }
+    
+    #Threshold HCR that is rebuilding Aware
+    if(tolower(parmgt$HCR) == 'simplethreshrebuildaware'){
+
+      if(inrebuildingplan==0){
+        F <- FrefRPvalue*parmgt$HCR_PAR1 
+      }
+      else if (inrebuildingplan==1){
+        F <- parmgt$HCR_PAR2
+      }
+    }
+    
+
+      
+      
+      
+      #Constant fishing mortality HCR
+      if(tolower(parmgt$HCR) == 'constf'){
+        F <- FThresh
+      }
+      
+      
+      
+      Ftemp[Bpick]<-F
+      
+      
+      if(inrebuildingplan==1){
+        F_In_Rebuild[[m]]<-Ftemp
+      }
+      
+      if(inrebuildingplan==0){
+        F_Regular[[m]]<-Ftemp
+      }
+        
+      
+    }  #end the Bpick forloop
+
+}  #end the Inrebuildinplan  forloop
+
+}# end the m forloop
+
+# Relevant cols of mproc
+mproc_extract<-mproc %>% select(mproc_id,HCR,HCR_PAR1, HCR_PAR2, HCR_PAR3)
+
+
+# Finagle F for the rebuilding plans. 
+# Stack the F's into a data.frame and cbind to the HCRs.
+F_In_Rebuild<-do.call(rbind,F_In_Rebuild)
+
+F_In_Rebuild<-as.data.frame(F_In_Rebuild)
+F_In_Rebuild<-cbind(F_In_Rebuild,mproc_extract)
+
+#reshape
+F_In_Rebuild<-tidyr::pivot_longer(F_In_Rebuild, cols=starts_with("V"), names_to="Biomass", values_to="F")
+
+# Add in Biomass, mark them as rebuilding.
+F_In_Rebuild<-F_In_Rebuild %>%
+  mutate(Biomass=as.numeric(str_replace(Biomass,"V","")))%>%
+  mutate(Biomass=B[Biomass],
+         InRebuild=1)
+
+F_In_Rebuild<-F_In_Rebuild %>%
+  mutate(Fraw=F,
+    F=ifelse(Biomass<=BrefRPvalue,F,NA))
+
+
+
+#Finagle F for not in a rebuilding plan  Same code as In_Rebuild.
+
+F_Regular<-do.call(rbind,F_Regular)
+F_Regular<-as.data.frame(F_Regular)
+F_Regular<-cbind(F_Regular,mproc_extract)
+F_Regular<-tidyr::pivot_longer(F_Regular, cols=starts_with("V"), names_to="Biomass", values_to="F")
+
+F_Regular <- F_Regular %>%
+  mutate(Biomass=as.numeric(str_replace(Biomass,"V","")))%>%
+  mutate(Biomass=B[Biomass],
+        InRebuild = 0 )
+F_Regular<-F_Regular %>%
+  mutate(Fraw=F,
+         F=ifelse(Biomass>=BThresh,F,NA))
+
+HCRs<-rbind(F_Regular, F_In_Rebuild)
+
+HCRs<- HCRs %>%
+  mutate(InRebuild=as.factor(InRebuild) ,
+         params=paste0("P1_",HCRs$HCR_PAR1,"_P2_",HCRs$HCR_PAR2,"_P3_", HCRs$HCR_PAR3),
+         paramsR=paste0("P1_",HCRs$HCR_PAR1,"_P2_",HCRs$HCR_PAR2,"_P3_", HCRs$HCR_PAR3, "_R_", HCRs$InRebuild)) %>%         mutate(HCR_combine=paste0(HCR,params),
+            HCR_combineR=paste0(HCR,paramsR))    
+         
+         
+
+# Try filtering on the HCR and piping that to ggplot
+table(HCRs$HCR)
+
+```
+
+\newpage
+
+## All the HCRs
+
+Looking at all the HCRs together is a bit of spaghetti. 
+
+```{r All_HCRs, echo=FALSE}
+
+ggplot(data=HCRs, 
+       mapping=aes(x=Biomass,y=F, group=HCR_combineR, color=HCR_combine)) +
+  geom_line() +
+  ylim(my_ymin,my_ymax) + 
+  theme(legend.position="bottom") + 
+  facet_grid(. ~ HCR)
+
+
+
+```
+\newpage 
+
+
+## Simple Threshold
+
+The **simplethresh** HCR harvest changes target F as a simple step function of stock biomass, with F set to zero at a level of abundance (e.g., 50%SSBMSY; Punt, 2010). 
+
+The rebuilding aware version:
+
+  * When the stock is not in a rebuilding plan, F=PAR1*FrefRPvalue.  
+  
+  * When the stock is in a rebuilding plan, F=PAR2
+
+```{r STRA, echo=FALSE}
+
+st<-HCRs %>% dplyr::filter(HCR=="simpleThreshRebuildAware")
+
+ggplot(data=st, 
+       mapping=aes(x=Biomass,y=F, group=paramsR, color=InRebuild)) +
+  geom_line() + 
+  ylim(my_ymin,my_ymax) + 
+  theme(legend.position="bottom") + 
+  facet_grid(. ~ params)
+
+
+
+```
+
+By varying the parameters, you can change the location of the lines. PAR1 controls the non-rebuilding F and PAR2 controls the rebuilding F.
+
+\newpage
+
+## Constant F Rebuild Aware
+
+* **constF**: A ‘constant fishing mortality’ HCR harvests the same fraction of the stock regardless of biomass
+
+* **constFRebuildAware**: A modification of the ‘constant fishing mortality’ HCR that sets a lower F when a stock is in a rebuilding plan.
+
+
+The rebuilding aware version:
+
+  * When the stock is not in a rebuilding plan, F=PAR1*FrefRPvalue.  
+  
+  * When the stock is in a rebuilding plan, F=PAR2*FrefRPvalue.  
+  
+  
+```{r CFRA, echo=FALSE}
+
+CF<-HCRs %>% dplyr::filter(HCR=="constFRebuildAware")
+
+ggplot(data=CF, 
+       mapping=aes(x=Biomass,y=F, group=paramsR, color=InRebuild)) +
+  geom_line() + 
+  ylim(my_ymin,my_ymax) + 
+  theme(legend.position="bottom") + 
+  facet_grid(. ~ params)
+
+
+
+```
+By varying the parameters, you can change the location of the lines. PAR1 controls the non-rebuilding F and PAR2 controls the rebuilding F.
+
+\newpage
+
+## Slide Rebuild Aware
+
+* **slide**: A sliding (or Ramp) control rule.  Similar to simplethresh, except when the estimated SSB is lower than the SSB reference point fishing is reduced though not all the way to zero. Instead, a line is drawn between $[SSBRefPoint, FRefPoint]$ and$ [0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.
+
+* **sliderebuildaware**: A sliding control rule with a second HCR during rebuilding. 
+
+
+The rebuilding aware version:
+
+  * When the stock is not in a rebuilding point, a line is drawn between [$Bthresh=1/2BMSY, FrefRPvalue*HCR\_PAR1$] and $[0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.   
+  
+  * When the stock is in a rebuilding plan, a line is drawn between [$SSBRefPoint*HCR\_PAR3, FRefPoint*HCR\_PAR2$] and $[0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.  
+  
+
+Setting PAR1, PAR2, PAR3 =  (FrefScalar,Frefscalar, BrefScalar)  (0.75,0.75, 0.5) will reproduce the non-rebuild aware HCR.
+
+```{r SLRA, echo=FALSE}
+
+SL<-HCRs %>% 
+  dplyr::filter(HCR=="slideRebuildAware") %>%
+  arrange(HCR_PAR3, HCR_PAR2, HCR_PAR1, InRebuild, Biomass) 
+
+ggplot(data=SL, 
+       mapping=aes(x=Biomass,y=F, group=paramsR, color=InRebuild)) +
+  geom_line() +
+  ylim(my_ymin,my_ymax) + 
+  theme(legend.position="bottom") + 
+  facet_wrap(. ~ reorder(params,HCR_PAR3), ncol=3)
+
+```
+
+By varying the parameters, you can change the bend point in the rebuilding part of the control rule. PAR1 controls the non-rebuilding F.  PAR3 controls the bend point in rebuilding and PAR2 controls the fishing mortality rate in the "in between" status, when the stock is not overfished, but not rebuilt. 
+
+PAR2 should be less than or equal to PAR1.  PAR3 should be somewhere between 0 and 1.
+
+Special Cases:
+
+The Constant F Rebuild Aware HCR can be implemented by setting PAR3=0.
+
+The Base "slide" HCR can be implemented by setting PAR1=PAR2 and PAR3=BrefScalar.
