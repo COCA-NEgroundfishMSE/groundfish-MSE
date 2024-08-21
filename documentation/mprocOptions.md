@@ -34,7 +34,7 @@ Status in New England groundfish management: This option has not been implemente
 
 * **slide**: A sliding control rule.  Similar to simplethresh, except when the estimated SSB is lower than the SSB reference point fishing is reduced though not all the way to zero. Instead, a line is drawn between $[SSBRefPoint, FRefPoint]$ and$ [0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.
 
-* **sliderebuildaware**: A sliding control rule with a second HCR during rebuilding. When the stock is not in a rebuilding point, a line is drawn between [$Bthresh=1/2BMSY, FrefRPvalue*HCR\_PAR1$] and $[0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.  When the stock is in a rebuilding plan, a line is drawn between [$SSBRefPoint*HCR\_PAR3, FRefPoint*HCR\_PAR2$] and $[0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.
+* **sliderebuildaware**: A sliding control rule with a second HCR during rebuilding. When the stock is not in a rebuilding point, a line is drawn between $[Bthresh=1/2BMSY, FrefRPvalue\*HCR\\_PAR1]$ and $[0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.  When the stock is in a rebuilding plan, a line is drawn between $[SSBRefPoint\*HCR\\_PAR3, FRefPoint\*HCR\\_PAR2]$ and $[0, 0]$ and the advice is the value for F on that line at the corresponding estimate of SSB.
 
 
 * **pstar**: The P* method. The aim of this HCR option is to avoid overfishing by accounting for scientific uncertainty with a probabilistic approach. In this scenario, the P* approach (Prager & Shertzer, 2010) is used to derive target catch. The P* method derives target catch as a low percentile of projected catch at the OFL, to allow for scientific uncertainty. The distribution of the catch at the OFL was assumed to follow a lognormal distribution with a CV of 1 (Wiedenmann et al., 2016). The target catch will correspond to a probability of overfishing no higher than 50% (P* <0.5) in accordance with the National Standard 1 guidelines. This option emulates HCRs used in many other Councils in the United States, such as the Mid-Atlantic Fishery Management Council (MAFMC). 
@@ -64,7 +64,7 @@ A second parameter to pass through to the harvest control rule.  For the Rebuild
 
 ## HCR_PAR3
 A third parameter to pass through to the harvest control rule.  For the Rebuild aware HCRs, 
-* **sliderebuildaware**: This is used to define the Threshold $B$ when the fishery *is* in a rebuilding plan. A line is drawn between [$SSBRefPoint*HCR\_PAR3, FRefPoint*HCR\_PAR2$] and [0, 0] and the advice is the value for F on that line at the corresponding estimate of SSB.
+* **sliderebuildaware**: This is used to define the Threshold $B$ when the fishery *is* in a rebuilding plan. A line is drawn between $[SSBRefPoint\*HCR\\_PAR3, FRefPoint\*HCR\\_PAR2]$ and [0, 0] and the advice is the value for F on that line at the corresponding estimate of SSB.
 
 
 
