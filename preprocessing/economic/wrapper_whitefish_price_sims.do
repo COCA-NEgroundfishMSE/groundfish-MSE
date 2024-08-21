@@ -17,7 +17,10 @@ global datafile_split_prefix "econ_data"
 
 
 /*filenames for input prices and output prices */
-global output_prices "MSE_adj_whitefish_price_series.dta"
+global output_prices1 "MSE_adj_cod_down_price_series.dta"
+
+global output_prices2 "MSE_adj_whitefish_up_price_series.dta"
+
 
 global input_prices "MSE_adj_whitefish_input_price_series.dta"
 global quota_price_out "reshape_quota_pricesMSE.dta"
