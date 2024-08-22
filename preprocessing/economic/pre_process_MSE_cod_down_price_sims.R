@@ -124,7 +124,7 @@ day_limits <- "trip_limits_forsim.dta"
 ####prefix  (see datafile_split_prefix in wrapper.do)
 yrstub<-"econ_data"
 # yearly_savename<-c("full_targeting_coefsnc2", "full_targeting_coefs")
-yearly_savename<-c("MSE_cod_down")
+yearly_savename<-c("MSE_codP_down")
 
 
 source(here("preprocessing","economic","targeting_coeff_import.R"))
