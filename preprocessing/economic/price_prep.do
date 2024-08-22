@@ -34,8 +34,6 @@ label variable `var' ""
 sort gffishingyear month
 
 
-compress
-
 gen post=0
 replace post=1 if gffishingyear>=2010
 order post gffishingyear month
