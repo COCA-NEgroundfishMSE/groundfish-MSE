@@ -5,6 +5,10 @@
 mults <- read.dta13(file.path(rawpath, input_price_loc))
 mults<-as.data.table(mults)
 
+mults <-mults %>%
+  mutate(across(starts_with("q_"), as.double))
+
+
 
 if (yrstub=="POSTasPRE"){
   mults[, c(quotaprice_zero_cf) :=0]
