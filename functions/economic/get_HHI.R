@@ -1,7 +1,6 @@
 
 # Function to compute an HHI
 ## Pass in a dataset and the name of a column, in quotation marks
-## sort in non-decreasing order 
 ## HHI = \sum_i=1^n share_i^2
 
 get_HHI=function(dataset, y){

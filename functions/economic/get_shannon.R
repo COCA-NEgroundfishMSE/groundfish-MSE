@@ -1,8 +1,7 @@
 
 # Function to compute a shannon index
 ## Pass in a dataset and the name of a column, in quotation marks
-## sort in non-decreasing order 
-## HHI = \sum_i=1^n share_i^2
+## Shannon= 1- \sum share*ln(share)
 
 get_shannon=function(dataset, y){
   y2<-as.name(y)
