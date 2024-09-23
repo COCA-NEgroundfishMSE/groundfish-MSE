@@ -1,0 +1,165 @@
+---
+title: "Figure Plots"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library("here")
+here::i_am("postprocessing/economic/figure_plot.Rmd")
+source(here("processes","get_runinfo.R"))
+
+source(here("processes","loadLibs.R"))
+
+
+
+library("knitr")
+library("viridis")
+  #library("kableExtra")
+library("tidyverse")
+library("data.table")
+options(knitr.kable.NA = '')
+knitr::opts_chunk$set(echo = TRUE)
+
+mprocfile<-"mprocEconTestRA.csv"
+
+#file_to_readin<-"results_2023-06-16-14-03-14"
+file_to_readin<-"results_2024-08-22-12-04-23"
+# This depends on something in  
+
+yr1<- 1851 
+
+# load all the functions
+
+ffiles <- list.files(path=here("functions"),full.names=TRUE, recursive=TRUE)
+invisible(sapply(ffiles, source))
+```
+
+```{r manual_readin_path, include=FALSE, eval=FALSE}
+# Run this to get results from the most recent path.
+#Setup paths, define things to graph.
+     st<-file_to_readin
+```
+
+```{r replicate_pick_definition}
+
+replicate_pick<-function(x){
+  if (length(x)<=190){
+    x<-x
+  } else{
+  
+    if (dim(x)[[1]]==10){
+      if (length(dim(x))==2){
+          x<-x[1:8,]
+      } else if (length(dim(x))==3){
+          x<-x[1:8,,]
+      }
+    }
+  }
+}
+```
+
+
+
+```{r process_omval, include=FALSE}
+# read in results file from omvalGlobal
+omvalGlobal_filename<-list.files(path=here(st,"sim"), pattern="^omvalGlobal", recursive=FALSE)
+
+
+for(i in 1:length(omvalGlobal_filename)){
+  load(here(st,"sim", omvalGlobal_filename[i]))
+
+  #Backup by appending "old" to the filename
+  save(omvalGlobal, file=here(st,"sim", paste0("old", omvalGlobal_filename[i])), compress=FALSE)
+
+  
+    for (stock in 1:5){
+      omvalGlobal[[stock]]<-lapply(omvalGlobal[[stock]],replicate_pick)
+    }
+
+  
+  
+  save(omvalGlobal, file=here(st,"sim", omvalGlobal_filename[i]), compress=FALSE)
+
+   
+}
+```
+
+
+
+```{r process_simlevel, include=FALSE}
+# read in results file from omvalGlobal
+simlevel_filename<-list.files(path=here(st,"sim"), pattern="^simlevelresults", recursive=FALSE)
+
+
+for(i in 1:length(simlevel_filename)){
+  simlevel<-readRDS(here(st,"sim", simlevel_filename[i]))
+
+  
+  
+  #Backup by appending "old" to the filename
+  saveRDS(simlevel, file=here(st,"sim", paste0("old", simlevel_filename[i])), compress=FALSE)
+
+  
+  simlevel<-lapply(simlevel,replicate_pick)
+  
+  saveRDS(simlevel, file=here(st,"sim", simlevel_filename[i]), compress=FALSE)
+
+   
+}
+
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r Testing, include=FALSE}
+
+
+
+# Testing
+# omval1<-flLst[[1]]
+# omval1$codGB$F_fullAdvice<-replicate_pick(omval1$codGB$F_fullAdvice)
+# 
+# omval1$codGB$ie_bias<-replicate_pick(omval1$codGB$ie_bias)
+# 
+# omval1$codGB$YEAR<-replicate_pick(omval1$codGB$YEAR)
+# omval1$codGB$Rest<-replicate_pick(omval1$codGB$Rest)
+
+# 
+# for (stock in 1:5){
+#   omval1[[stock]]<-lapply(omval1[[stock]],replicate_pick)
+# }
+# 
+# 
+# for(i in 1:length(omvalGlobal_filename)){
+#   load(here(st,"sim", omvalGlobal_filename[i]))
+#   flLst[[i]] <- omvalGlobal
+# #  names(flLst[[i]]) <- names(omvalGlobal)
+#   omvalGlobal<-NULL
+# }
+
+
+```
+
+
+\newpage
+
+
+
+
+
+

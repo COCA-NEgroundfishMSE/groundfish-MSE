@@ -18,7 +18,7 @@ if(runClass != 'local' ){
 }
 
 source(here("processes","EconStorage.R")) 
-save_econ_raw<-FALSE
+save_econ_raw<-TRUE
 ####################These are temporary changes for testing ####################
 
 ####################End Temporary changes for testing ####################
