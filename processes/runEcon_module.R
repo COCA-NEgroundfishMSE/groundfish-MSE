@@ -164,7 +164,7 @@ working_targeting [, harvest_sim:= ifelse(is.na(dl_primary), harvest_sim, ifelse
     # Predict targeting
     # this is where infeasible trips should be eliminated.
     
-    trips<-zero_out_closed_areas_asc_cutout(trips,fishery_holder)
+    trips<-zero_out_closed_areas_asc_cutout(trips,fishery_holder,econtype)
   
   # draw trips probabilistically.  A trip is selected randomly from the choice set. 
   # The probability of selection is equal to prhat
