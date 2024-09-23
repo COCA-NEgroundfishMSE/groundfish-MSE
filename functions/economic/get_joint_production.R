@@ -54,17 +54,21 @@ get_joint_production <- function(wt,spstock_names, fh, ec_type){
   
     
   mul_alloc<-fh[mults_allocated==1]
-  if (ec_type$EconType=="Multi"){
-      closeds<-mul_alloc[stockarea_open==FALSE]$spstock2
-    }else if (ec_type$EconType=="Single"){
-      closeds<-mul_alloc[underACL==FALSE]$spstock2
-    }
+ 
+ #if (ec_type$EconType=="Multi"){
+ #    closeds<-mul_alloc[stockarea_open==FALSE]$spstock2
+ #  }else if (ec_type$EconType=="Single"){
+ #    closeds<-mul_alloc[underACL==FALSE]$spstock2
+ #  }
+   
+  # Stocks that are closed get negative expected revenue
+  closeds<-mul_alloc[underACL==FALSE]$spstock2
   
-  wt[spstock2 %in% closeds, exp_rev_total :=-1e6]
+  
+  wt[spstock2 %in% closeds, exp_rev_total :=min(-1e6,exp_rev_total)]
   wt[spstock2 %in% closeds, actual_rev_total :=0]
     
-  
-  
+
   return(wt)
   
 }
