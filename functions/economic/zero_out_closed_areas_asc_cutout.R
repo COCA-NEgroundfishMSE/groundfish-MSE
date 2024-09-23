@@ -10,7 +10,6 @@
 # tds: working targeting dataset with asclogit coefficients 
 # open_hold: a dataset of hullnum and spstock2 with one extra column (open=1 if open and =0 if closed).
 # ec_type: econtype taken from the mproc dataframe
-# I need to fix this, because it does not close an entire stock area when a single catch limit is reached. 
 #  
 
 
