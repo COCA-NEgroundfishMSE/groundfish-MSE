@@ -82,8 +82,8 @@ get_predict_quota_prices <- function(){
   # If there is less than 10% quota remaining, set the quota price the largest of the predicted price or the output price  
   quarterly[fraction_remaining_BOQ <= .10, ycen := max(ycen, live_priceGDP)]
   
-    # If there is less than 5% quota remaining, set the quota price to the max defined above.
-  quarterly[fraction_remaining_BOQ <= .05, ycen := ub_qp]
+  # If there is less than 2% quota remaining, set the quota price to the max defined above.
+  quarterly[fraction_remaining_BOQ <= .02, ycen := ub_qp]
   
   # And a lower bound of 1 cent
   quarterly[ycen <= 0.01, ycen := 0.01]
