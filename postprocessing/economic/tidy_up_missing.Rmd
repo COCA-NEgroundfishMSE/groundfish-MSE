@@ -1,15 +1,22 @@
 ---
-title: "Figure Plots"
+title: "Tidying up"
 output:
   pdf_document: default
   html_document: default
 ---
+This is code to deal with a partial model run. When you run a model, something might crash, leaving you with a partial number of replicates. You'll need to figure out which replicate was full run. Then keep elements of the data matrices that are less than or equal to that number. 
+
+
+You will need to modify 2 things
+1.  The file path to read in the results
+2.  The the number of the final replicate to keep (8 in this case.)
+
+
 
 ```{r setup, include=FALSE}
 library("here")
-here::i_am("postprocessing/economic/figure_plot.Rmd")
+here::i_am("postprocessing/economic/tidy_up_missing.Rmd")
 source(here("processes","get_runinfo.R"))
-
 source(here("processes","loadLibs.R"))
 
 
@@ -22,25 +29,11 @@ library("data.table")
 options(knitr.kable.NA = '')
 knitr::opts_chunk$set(echo = TRUE)
 
-mprocfile<-"mprocEconTestRA.csv"
+st<-"results_2024-08-22-12-04-23"
 
-#file_to_readin<-"results_2023-06-16-14-03-14"
-file_to_readin<-"results_2024-08-22-12-04-23"
-# This depends on something in  
-
-yr1<- 1851 
-
-# load all the functions
-
-ffiles <- list.files(path=here("functions"),full.names=TRUE, recursive=TRUE)
-invisible(sapply(ffiles, source))
 ```
 
-```{r manual_readin_path, include=FALSE, eval=FALSE}
-# Run this to get results from the most recent path.
-#Setup paths, define things to graph.
-     st<-file_to_readin
-```
+
 
 ```{r replicate_pick_definition}
 
